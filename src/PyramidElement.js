@@ -8,7 +8,8 @@ class PyramidElement extends React.Component {
         height: React.PropTypes.number.isRequired,
         top: React.PropTypes.number,
         left: React.PropTypes.number,
-        type: React.PropTypes.string
+        type: React.PropTypes.string,
+        baseClass: React.PropTypes.string
     };
 
     static defaultProps = { 
@@ -16,17 +17,16 @@ class PyramidElement extends React.Component {
         height: 0,
         top: 0,
         left: 0,
-        type: "img" //todo: no default, and make required
+        type: "img",
+        baseClass: "element"
     };
 
     constructor(props) {
         super(props);
-
+        this.classes = new BEMHelper(props.baseClass);
         this.state = {
-            loaded: false,
-            classes: this.props.baseClass ? new BEMHelper(this.props.baseClass) : new BEMHelper("element")
+            loaded: false
         };
-
         this.styleNormalizer = {
             margin: 0,
             padding: 0,
@@ -46,7 +46,7 @@ class PyramidElement extends React.Component {
             position: "absolute",
             top: this.props.top,
             left: this.props.left,
-            transition: "all 300ms linear",
+            transition: this.props.transition
         });
 
         normalizerCopy = Object.assign({}, this.styleNormalizer);
@@ -63,7 +63,7 @@ class PyramidElement extends React.Component {
 
         var elementProps = {
             src: this.props.src,
-            className: this.state.classes(this.props.type),
+            className: this.classes(this.props.type).className,
             style: style,
             onLoad: this.handleImageLoaded.bind(this),
             onClick: this.props.onClick || function(event) {
@@ -76,7 +76,7 @@ class PyramidElement extends React.Component {
         var element = React.createElement(this.props.type, elementProps);
 
         return(
-            <div style={containerStyle} {...this.state.classes()}>
+            <div style={containerStyle} {...this.classes()}>
                 {this.props.inView ? element : ""}
             </div>
         );

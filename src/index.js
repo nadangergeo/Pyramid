@@ -7,32 +7,46 @@ import throttle from "lodash.throttle";
 import PyramidElement from "./PyramidElement";
 
 export default class Pyramid extends React.Component {
-    constructor(props) {
-        super(props);
-        this.props = props;
-        this.erd = elementResizeDetector({strategy: "scroll"});
-        this.state = {
-            pyramidWidth: null,
-            numberOfColumns: 1,
-            breakpoints: props.breakpoints ? props.breakpoints : {
+    static propTypes = { 
+        elements: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+        numberOfColumns: React.PropTypes.object,
+        magicValues: React.PropTypes.object,
+        baseClass: React.PropTypes.string,
+        gutter: React.PropTypes.number,
+        transition: React.PropTypes.string,
+        derenderIfNotInViewAnymore: React.PropTypes.bool,
+        style: React.PropTypes.object,
+        onElementClick: React.PropTypes.func
+    };
+
+    static defaultProps = { 
+        elements: [],
+        numberOfColumns: {
+            default: 1,
+            breakpoints: {
                 "768px"  : 2,
                 "1024px" : 3,
                 "1280px" : 4,
                 "1440px" : 5 
-            },
-            gutter: props.gutter ? props.gutter : 20,
-            magicValue: props.magicValue ? props.magicValue : 0.2,
-            allElementProps: [],
-            elements: props.elements ? props.elements : [],
-            classes: props.baseClass ? new BEMHelper(props.baseClass) : new BEMHelper("pyramid"),
-            strictInViewChecker: false
-        }
-    }
+            }
+        },
+        magicValues: {
+            default: 0
+        },
+        baseClass: "pyramid",
+        gutter: 20,
+        transition: "all 300ms linear",
+        derenderIfNotInViewAnymore: false
+    };
 
-    componentWillReceiveProps(nextProps) {
-        this.setState({
-            elements: nextProps.elements ? nextProps.elements : this.state.elements
-        });
+    constructor(props) {
+        super(props);
+        this.erd = elementResizeDetector({strategy: "scroll"});
+        this.classes = new BEMHelper(props.baseClass);
+        this.state = {
+            pyramidWidth: null,
+            allElementProps: []
+        }
     }
 
     reRender() {
@@ -52,9 +66,6 @@ export default class Pyramid extends React.Component {
     render() {
         if(this.refs.pyramid) {
             this.state.pyramidWidth = this.refs.pyramid.clientWidth;
-            if(this.state.pyramidWidth < 768) {
-                this.state.magicValue = 1;
-            }
         }
 
         let pyramidStyle = {
@@ -72,26 +83,39 @@ export default class Pyramid extends React.Component {
 
         if(this.state && !this.state.pyramidWidth) {            
             return (
-                <div ref="pyramid" style={pyramidStyle} {...this.state.classes()}></div>
+                <div ref="pyramid" style={pyramidStyle} {...this.classes()}></div>
             )
         }
 
-        this.state.numberOfColumns = 1;
-
-        for(key in this.state.breakpoints) {
+        let numberOfColumns = this.props.numberOfColumns.default;
+        for(key in this.props.numberOfColumns.breakpoints) {
             let unit = getUnit(key);
 
             if(unit !== "px") {
-                throw new Error("Pyramid does not support " + unit + "yet. You could always help out to implement it and make a pull request ^^ Cheers!");
+                throw new Error("Pyramid does not support the unit '" + unit + "' in the property numberOfColumns. You could always help out to implement it and make a pull request ^^ Cheers!");
             }
 
-            if(this.state.pyramidWidth > parseInt(key)) {
-                this.state.numberOfColumns = this.state.breakpoints[key];
+            if(this.state.pyramidWidth >= parseInt(key)) {
+                numberOfColumns = this.props.numberOfColumns.breakpoints[key];
+            }
+        }
+
+        let magicValue = this.props.magicValues.default;
+        for(key in this.props.magicValues.breakpoints) {
+            let unit = getUnit(key);
+
+            if(unit !== "px") {
+                throw new Error("Pyramid does not support the unit '" + unit + "' in the property magicValues. You could always help out to implement it and make a pull request ^^ Cheers!");
+            }
+
+            if(this.state.pyramidWidth >= parseInt(key)) {
+                magicValue = this.props.magicValues.breakpoints[key];
             }
         }
 
         let key;
-        let elements = this.state.elements.filter( element => {
+        let elements = this.props.elements.filter( element => {
+
             if(!element.src || element.src === "") {
                 // console.error("One of the elements does not have a source :-(");
                 return false;
@@ -108,22 +132,22 @@ export default class Pyramid extends React.Component {
             }
 
             return true;
+
         }).map( (element, index, elements) => {
             key = index;
-            let numberOfColumns = this.state.numberOfColumns;
-            let elementWidth = (this.state.pyramidWidth - (numberOfColumns + 1) * this.state.gutter ) / numberOfColumns;
+            let elementWidth = (this.state.pyramidWidth - (numberOfColumns + 1) * this.props.gutter ) / numberOfColumns;
             let elementHeight = (elementWidth / element.orgWidth) * element.orgHeight;
             let elementProps = {
                 type: element.type,
                 src: element.src,
                 href: element.href,
-                top: this.state.gutter,
-                left: this.state.gutter,
+                top: this.props.gutter,
+                left: this.props.gutter,
                 zIndex: 1000,
                 width: elementWidth,
                 height: elementHeight,
                 inView: this.state.allElementProps[key] ? this.state.allElementProps[key].inView : false,
-                numberOfColumns: numberOfColumns,
+                transition: this.props.transition
             }
 
             //if the element is NOT in the first row
@@ -131,7 +155,7 @@ export default class Pyramid extends React.Component {
                 let elementAbove = this.state.allElementProps[key - numberOfColumns];
 
                 if(elementAbove) {
-                    elementProps.top = elementAbove.top + elementAbove.height + this.state.gutter;
+                    elementProps.top = elementAbove.top + elementAbove.height + this.props.gutter;
                 }
             } 
 
@@ -140,29 +164,29 @@ export default class Pyramid extends React.Component {
                 let elementToTheLeft = this.state.allElementProps[key - 1];
 
                 if(elementToTheLeft) {
-                    elementProps.left = elementToTheLeft.left + elementToTheLeft.width + this.state.gutter;
+                    elementProps.left = elementToTheLeft.left + elementToTheLeft.width + this.props.gutter;
                 }
             }
 
             //if the element is in the last row
             if(key >= (elements.length - numberOfColumns)) {
-                elementProps.marginBottom = this.state.gutter;
+                elementProps.marginBottom = this.props.gutter;
             }
 
             //if the element is in view (or close to using magic value)
             if(
-                ( elementProps.top + (this.state.magicValue * this.refs.pyramid.offsetHeight) > this.refs.pyramid.scrollTop
+                ( elementProps.top + (magicValue * this.refs.pyramid.offsetHeight) > this.refs.pyramid.scrollTop
                   &&
-                  elementProps.top < ( this.refs.pyramid.scrollTop + this.refs.pyramid.offsetHeight) + (this.state.magicValue * this.refs.pyramid.offsetHeight)
+                  elementProps.top < ( this.refs.pyramid.scrollTop + this.refs.pyramid.offsetHeight) + (magicValue * this.refs.pyramid.offsetHeight)
                 )
                 ||
-                ( (elementProps.top + elementProps.height) + (this.state.magicValue * this.refs.pyramid.offsetHeight) > this.refs.pyramid.scrollTop
+                ( (elementProps.top + elementProps.height) + (magicValue * this.refs.pyramid.offsetHeight) > this.refs.pyramid.scrollTop
                   &&
-                  elementProps.top + elementProps.height < (this.refs.pyramid.scrollTop + this.refs.pyramid.offsetHeight) + (this.state.magicValue * this.refs.pyramid.offsetHeight)
+                  elementProps.top + elementProps.height < (this.refs.pyramid.scrollTop + this.refs.pyramid.offsetHeight) + (magicValue * this.refs.pyramid.offsetHeight)
                 )
             ) {
                 elementProps.inView = true;
-            } else if(this.props.strictInViewChecker) {
+            } else if(this.props.derenderIfNotInViewAnymore) {
                 elementProps.inView = false;
             }
 
@@ -172,7 +196,7 @@ export default class Pyramid extends React.Component {
 
             this.state.allElementProps[key] = elementProps;
 
-            let baseClass = this.state.classes("element").className;
+            let baseClass = this.classes("element").className;
 
             return (
                 <PyramidElement baseClass={baseClass} key={key} {...elementProps}/>
@@ -180,15 +204,15 @@ export default class Pyramid extends React.Component {
         });
 
         return (
-            <div ref="pyramid" style={pyramidStyle} {...this.state.classes()}>
+            <div ref="pyramid" style={pyramidStyle} {...this.classes()}>
                 {elements}
             </div>
         );
     }
 
-    handleClick(key) {
+    handleClick(key, event) {
         if(this.props.onElementClick) {
-            this.props.onElementClick(this.state.allElementProps[key]);
+            this.props.onElementClick(this.state.allElementProps[key], event);
         }
     }
 

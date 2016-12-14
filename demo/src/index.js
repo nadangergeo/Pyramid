@@ -40,7 +40,7 @@ class Demo extends React.Component {
             return gifs;
 
         }).then(gifs => {
-            console.dir(gifs);
+            // console.dir(gifs);
 
             _this.setState({
                 elements: gifs
@@ -67,7 +67,7 @@ class Demo extends React.Component {
                 <div className="input-container">
                     <input ref="input" type="search" placeholder="Search Giphy…" onChange={this.handleSearch.bind(this)} />
                 </div>
-                <Pyramid style={pyramidStyle} elements={this.state.elements} magicValue="0" strictInViewChecker="true" />
+                <Pyramid style={pyramidStyle} elements={this.state.elements} derenderIfNotInViewAnymore={true} />
             </div>
         );
     }
