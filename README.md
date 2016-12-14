@@ -15,6 +15,15 @@ Responsive masonry grid with infinte scroll and lazy loading, built with react.
 [coveralls-badge]: https://img.shields.io/coveralls/user/repo/master.png?style=flat-square
 [coveralls]: https://coveralls.io/github/user/repo
 
+## Demo
+
+Fun Giphy example:
+http://gergeo.se/pyramid-demo/
+(Source in this repo)
+
+Basic example which combines iframes and images:
+http://blimp.se/ (source: https://github.com/BlimpBureau/blimpbureau.github.io)
+
 ## Install
 npm install react-pyramid --save
 
