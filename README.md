@@ -43,13 +43,13 @@ elements = [
     orgWidth: 1080, //the original width of the image (required)
     orgHeight: 1080 //the original height of the image (required)
     href: "images/cat.png" //give image a link (optional)
-    },
-    {
-      type: "iframe",
-      src: "http://foo.bar/dog.html", //required
-      orgWidth: 1337, //required
-      orgHeight: 1337 //required
-    }
+  },
+  {
+    type: "iframe",
+    src: "http://foo.bar/dog.html", //required
+    orgWidth: 1337, //required
+    orgHeight: 1337 //required
+  }
 ]
 ```
 
