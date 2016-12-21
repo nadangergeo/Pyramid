@@ -15,6 +15,12 @@ Responsive masonry grid with infinte scroll and lazy loading, built with react.
 [coveralls-badge]: https://img.shields.io/coveralls/user/repo/master.png?style=flat-square
 [coveralls]: https://coveralls.io/github/user/repo
 
+## Todo:
+
+- [ ] Allow passing elements as children (instead?)
+- [ ] Allow react components as elements
+- [ ] *Super secret plan*
+
 ## Demo
 
 Fun Giphy example:
