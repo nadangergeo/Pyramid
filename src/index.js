@@ -8,10 +8,9 @@ import PyramidElement from "./PyramidElement";
 
 export default class Pyramid extends React.Component {
     static propTypes = { 
-        elements: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
         numberOfColumns: React.PropTypes.object,
         magicValues: React.PropTypes.object,
-        baseClass: React.PropTypes.string,
+        className: React.PropTypes.string,
         gutter: React.PropTypes.number,
         transition: React.PropTypes.string,
         derenderIfNotInViewAnymore: React.PropTypes.bool,
@@ -20,7 +19,6 @@ export default class Pyramid extends React.Component {
     };
 
     static defaultProps = { 
-        elements: [],
         numberOfColumns: {
             default: 1,
             breakpoints: {
@@ -33,16 +31,16 @@ export default class Pyramid extends React.Component {
         magicValues: {
             default: 0
         },
-        baseClass: "pyramid",
+        className: "pyramid",
         gutter: 20,
-        transition: "all 300ms linear",
+        transition: "none",
         derenderIfNotInViewAnymore: false
     };
 
     constructor(props) {
         super(props);
         this.erd = elementResizeDetector({strategy: "scroll"});
-        this.classes = new BEMHelper(props.baseClass);
+        this.classes = new BEMHelper(props.className);
         this.state = {
             pyramidWidth: null,
             allElementProps: []
@@ -114,20 +112,15 @@ export default class Pyramid extends React.Component {
         }
 
         let key;
-        let elements = this.props.elements.filter( element => {
+        let elements = this.props.children.filter( element => {
 
-            if(!element.src || element.src === "") {
-                // console.error("One of the elements does not have a source :-(");
+            if(!element.props.width) {
+                throw new Error("The original width of the element needs to be supplied. This is to maintain aspect ratio.");
                 return false;
             }
 
-            if(!element.orgWidth || element.orgWidth === "0") {
-                // console.error("The original width of the element needs to be supplied.");
-                return false;
-            }
-
-            if(!element.orgHeight || element.orgHeight === "0") {
-                // console.error("The original height of the element needs to be supplied.");
+            if(!element.props.height) {
+                throw new Error("The original height of the element needs to be supplied. This is to maintain aspect ratio.");
                 return false;
             }
 
@@ -135,15 +128,14 @@ export default class Pyramid extends React.Component {
 
         }).map( (element, index, elements) => {
             key = index;
+
+            let elementClassName = this.classes("element").className;
             let elementWidth = (this.state.pyramidWidth - (numberOfColumns + 1) * this.props.gutter ) / numberOfColumns;
-            let elementHeight = (elementWidth / element.orgWidth) * element.orgHeight;
+            let elementHeight = (elementWidth / element.props.width) * element.props.height;
+
             let elementProps = {
-                type: element.type,
-                src: element.src,
-                href: element.href,
                 top: this.props.gutter,
                 left: this.props.gutter,
-                zIndex: 1000,
                 width: elementWidth,
                 height: elementHeight,
                 inView: this.state.allElementProps[key] ? this.state.allElementProps[key].inView : false,
@@ -196,10 +188,10 @@ export default class Pyramid extends React.Component {
 
             this.state.allElementProps[key] = elementProps;
 
-            let baseClass = this.classes("element").className;
-
             return (
-                <PyramidElement baseClass={baseClass} key={key} {...elementProps}/>
+                <PyramidElement className={elementClassName} key={key} {...elementProps}>
+                    {element}
+                </PyramidElement>
             )
         });
 

@@ -9,7 +9,7 @@ class Demo extends React.Component {
         super(props);
 
         this.state = {
-            elements: []
+            gifs: []
         }
     }
 
@@ -32,18 +32,26 @@ class Demo extends React.Component {
                 return {
                     src: image.url,
                     href: image.url,
-                    orgWidth: image.width,
-                    orgHeight: image.height
+                    width: image.width,
+                    height: image.height
                 }
             });
 
             return gifs;
 
-        }).then(gifs => {
-            // console.dir(gifs);
+        }).then(gifs =>{
+            //some objects returned by giphy have no src property.
+            //we need to filter
+            return gifs.filter( gif => {
+                if(!gif.src || gif.src === "") {
+                    return false;
+                }
 
+                return true;
+            });
+        }).then(gifs => {
             _this.setState({
-                elements: gifs
+                gifs: gifs
             });
         });
     }
@@ -62,12 +70,18 @@ class Demo extends React.Component {
             height: "80%"
         };
 
+        let elements = this.state.gifs.map( (gif, index) => {
+            return <img onClick={ e => window.open(gif.href, "_blank")} key={index} src={gif.src} width={gif.width} height={gif.height}/>;
+        });
+
         return (
             <div style={style}>
                 <div className="input-container">
                     <input ref="input" type="search" placeholder="Search Giphy…" onChange={this.handleSearch.bind(this)} />
                 </div>
-                <Pyramid style={pyramidStyle} elements={this.state.elements} derenderIfNotInViewAnymore={true} />
+                <Pyramid style={pyramidStyle} derenderIfNotInViewAnymore={true} onElementClick={ (element, event) => console.log(element, event)}>
+                    {elements}
+                </Pyramid>
             </div>
         );
     }

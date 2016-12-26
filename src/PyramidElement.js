@@ -3,13 +3,12 @@ import BEMHelper from "react-bem-helper";
 
 class PyramidElement extends React.Component {
     static propTypes = { 
-        src: React.PropTypes.string.isRequired,
         width: React.PropTypes.number.isRequired,
         height: React.PropTypes.number.isRequired,
         top: React.PropTypes.number,
         left: React.PropTypes.number,
         type: React.PropTypes.string,
-        baseClass: React.PropTypes.string
+        className: React.PropTypes.string
     };
 
     static defaultProps = { 
@@ -18,12 +17,12 @@ class PyramidElement extends React.Component {
         top: 0,
         left: 0,
         type: "img",
-        baseClass: "element"
+        className: "element"
     };
 
     constructor(props) {
         super(props);
-        this.classes = new BEMHelper(props.baseClass);
+        this.classes = new BEMHelper(props.className);
         this.state = {
             loaded: false
         };
@@ -36,9 +35,10 @@ class PyramidElement extends React.Component {
 
     render() {
         let thisComponent = this;
+        let element = this.props.children;
 
-        let normalizerCopy = Object.assign({}, this.styleNormalizer);
-        let containerStyle = Object.assign(normalizerCopy, {
+        let containerStyle = Object.assign({}, this.styleNormalizer);
+        containerStyle = Object.assign(containerStyle, {
             backgroundColor: "rgba(0,0,0,0.1)",
             display: "block",
             width: this.props.width + "px",
@@ -46,37 +46,37 @@ class PyramidElement extends React.Component {
             position: "absolute",
             top: this.props.top,
             left: this.props.left,
-            transition: this.props.transition
+            transition: this.props.transition,
+            marginBottom: this.props.marginBottom + "px",
+            cursor: this.props.onClick ? "pointer" : "default"
         });
 
-        normalizerCopy = Object.assign({}, this.styleNormalizer);
-        let style = Object.assign(normalizerCopy, {
+        let elementStyle = Object.assign({}, this.styleNormalizer);
+        if(element.props.style) {
+            elementStyle = Object.assign(elementStyle, element.props.style);
+        }
+        elementStyle = Object.assign(elementStyle, {
             width: "100%",
             height: "100%",
-            marginBottom: this.props.marginBottom + "px",
             opacity: this.props.inView && this.state.loaded ? 1 : 0,
             transition: "opacity 300ms linear",
-            cursor: this.props.href || this.props.onClick ? "pointer" : "default",
+            cursor: element.props.onClick ? "pointer" : "default",
             WebkitTransform: "translateZ(0)", //GPU-acceleration, does it help?
             transform: "translateZ(0)"
         });
 
         var elementProps = {
-            src: this.props.src,
-            className: this.classes(this.props.type).className,
-            style: style,
+            className: this.classes(element.type).className,
+            style: elementStyle,
             onLoad: this.handleImageLoaded.bind(this),
-            onClick: this.props.onClick || function(event) {
-                if(thisComponent.props.href) {
-                    window.open(thisComponent.props.href, "_blank");
-                }
-            }
+            width: null, //nullify because it is not needed anymore
+            height: null //nullify because it is not needed anymore
         }
 
-        var element = React.createElement(this.props.type, elementProps);
+        element = React.cloneElement(element, elementProps);
 
         return(
-            <div style={containerStyle} {...this.classes()}>
+            <div style={containerStyle} {...this.classes()} onClick={this.props.onClick}>
                 {this.props.inView ? element : ""}
             </div>
         );
