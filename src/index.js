@@ -86,7 +86,7 @@ export default class Pyramid extends React.Component {
         }
 
         let numberOfColumns = this.props.numberOfColumns.default;
-        for(key in this.props.numberOfColumns.breakpoints) {
+        for(let key in this.props.numberOfColumns.breakpoints) {
             let unit = getUnit(key);
 
             if(unit !== "px") {
@@ -99,7 +99,7 @@ export default class Pyramid extends React.Component {
         }
 
         let magicValue = this.props.magicValues.default;
-        for(key in this.props.magicValues.breakpoints) {
+        for(let key in this.props.magicValues.breakpoints) {
             let unit = getUnit(key);
 
             if(unit !== "px") {
@@ -111,24 +111,23 @@ export default class Pyramid extends React.Component {
             }
         }
 
-        let key;
         let elements = this.props.children.filter( element => {
+            if(!element.props.width || !element.props.height) {
+                switch(element.type) {
+                    case "img":
+                    case "video":
+                    case "iframe":
+                        throw new Error("The original width and height of a media element (img, video, iframe) should be supplied. This is because Pyramid needs to calculate the aspect ratio before the media has loaded. Otherwise Pyramid needs to measure the element once the resource has loaded = not optimal. Tough love <3");
+                        return false;
 
-            if(!element.props.width) {
-                throw new Error("The original width of the element needs to be supplied. This is to maintain aspect ratio.");
-                return false;
+                    default:
+                        throw new Error("Element type  '" + element.type + "' is not supported. Pyramid, currently only supports img, video and iframe. But don't worry, it will fully support all kinds of elements soon! (the nut is tougher too crack than meets the eye)");
+                        return false;
+                }
+            } else {
+                return true;
             }
-
-            if(!element.props.height) {
-                throw new Error("The original height of the element needs to be supplied. This is to maintain aspect ratio.");
-                return false;
-            }
-
-            return true;
-
         }).map( (element, index, elements) => {
-            key = index;
-
             let elementClassName = this.classes("element").className;
             let elementWidth = (this.state.pyramidWidth - (numberOfColumns + 1) * this.props.gutter ) / numberOfColumns;
             let elementHeight = (elementWidth / element.props.width) * element.props.height;
@@ -138,13 +137,13 @@ export default class Pyramid extends React.Component {
                 left: this.props.gutter,
                 width: elementWidth,
                 height: elementHeight,
-                inView: this.state.allElementProps[key] ? this.state.allElementProps[key].inView : false,
+                inView: this.state.allElementProps[index] ? this.state.allElementProps[index].inView : false,
                 transition: this.props.transition
             }
 
             //if the element is NOT in the first row
-            if(key >= numberOfColumns) {
-                let elementAbove = this.state.allElementProps[key - numberOfColumns];
+            if(index >= numberOfColumns) {
+                let elementAbove = this.state.allElementProps[index - numberOfColumns];
 
                 if(elementAbove) {
                     elementProps.top = elementAbove.top + elementAbove.height + this.props.gutter;
@@ -152,8 +151,8 @@ export default class Pyramid extends React.Component {
             } 
 
             //if the element is NOT the first element in a row
-            if(key % numberOfColumns > 0) {
-                let elementToTheLeft = this.state.allElementProps[key - 1];
+            if(index % numberOfColumns > 0) {
+                let elementToTheLeft = this.state.allElementProps[index - 1];
 
                 if(elementToTheLeft) {
                     elementProps.left = elementToTheLeft.left + elementToTheLeft.width + this.props.gutter;
@@ -161,7 +160,7 @@ export default class Pyramid extends React.Component {
             }
 
             //if the element is in the last row
-            if(key >= (elements.length - numberOfColumns)) {
+            if(index >= (elements.length - numberOfColumns)) {
                 elementProps.marginBottom = this.props.gutter;
             }
 
@@ -183,13 +182,13 @@ export default class Pyramid extends React.Component {
             }
 
             if(this.props.onElementClick) {
-                elementProps.onClick = this.handleClick.bind(this, key);
+                elementProps.onClick = this.handleClick.bind(this, index);
             }
 
-            this.state.allElementProps[key] = elementProps;
+            this.state.allElementProps[index] = elementProps;
 
             return (
-                <PyramidElement className={elementClassName} key={key} {...elementProps}>
+                <PyramidElement className={elementClassName} key={index} {...elementProps}>
                     {element}
                 </PyramidElement>
             )
@@ -202,9 +201,9 @@ export default class Pyramid extends React.Component {
         );
     }
 
-    handleClick(key, event) {
+    handleClick(index, event) {
         if(this.props.onElementClick) {
-            this.props.onElementClick(this.state.allElementProps[key], event);
+            this.props.onElementClick(this.state.allElementProps[index], event);
         }
     }
 
