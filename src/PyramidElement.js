@@ -8,7 +8,8 @@ class PyramidElement extends React.Component {
         top: React.PropTypes.number,
         left: React.PropTypes.number,
         type: React.PropTypes.string,
-        className: React.PropTypes.string
+        className: React.PropTypes.string,
+        transition: React.PropTypes.string
     };
 
     static defaultProps = { 
@@ -17,7 +18,8 @@ class PyramidElement extends React.Component {
         top: 0,
         left: 0,
         type: "img",
-        className: "element"
+        className: "element",
+        transition: "none"
     };
 
     constructor(props) {
@@ -42,7 +44,7 @@ class PyramidElement extends React.Component {
             backgroundColor: "rgba(0,0,0,0.1)",
             display: "block",
             width: this.props.width + "px",
-            height: this.props.height + "px",
+            height: isNaN(this.props.height) ? this.props.height : this.props.height + "px",
             position: "absolute",
             top: this.props.top,
             left: this.props.left,
@@ -57,7 +59,7 @@ class PyramidElement extends React.Component {
         }
         elementStyle = Object.assign(elementStyle, {
             width: "100%",
-            height: "100%",
+            height: "auto",
             opacity: this.props.inView && this.state.loaded ? 1 : 0,
             transition: "opacity 300ms linear",
             cursor: element.props.onClick ? "pointer" : "default",
