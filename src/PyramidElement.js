@@ -1,15 +1,21 @@
 import React from "react";
 import BEMHelper from "react-bem-helper";
 
-class PyramidElement extends React.Component {
+class PyramidElement extends React.PureComponent {
     static propTypes = { 
         width: React.PropTypes.number.isRequired,
-        height: React.PropTypes.number.isRequired,
+        height: React.PropTypes.oneOfType([
+                    React.PropTypes.string,
+                    React.PropTypes.number
+                ]).isRequired,
         top: React.PropTypes.number,
         left: React.PropTypes.number,
         type: React.PropTypes.string,
+        style: React.PropTypes.object,
         className: React.PropTypes.string,
-        transition: React.PropTypes.string
+        transition: React.PropTypes.string,
+        inView: React.PropTypes.bool,
+        onClick: React.PropTypes.func
     };
 
     static defaultProps = { 
@@ -19,14 +25,17 @@ class PyramidElement extends React.Component {
         left: 0,
         type: "img",
         className: "element",
-        transition: "none"
+        transition: "none",
+        inView: true,
+        onClick: null
     };
 
     constructor(props) {
         super(props);
+        this.mediaTypes = ["img", "video", "audio", "object", "iframe"];
         this.classes = new BEMHelper(props.className);
         this.state = {
-            loaded: false
+            loaded: this.mediaTypes.indexOf(this.props.children.type) !== -1 ? false : true
         };
         this.styleNormalizer = {
             margin: 0,
@@ -52,25 +61,29 @@ class PyramidElement extends React.Component {
             marginBottom: this.props.marginBottom + "px",
             cursor: this.props.onClick ? "pointer" : "default"
         });
+        if(this.props.style) {
+            containerStyle = Object.assign(containerStyle, this.props.style);
+        }
 
         let elementStyle = Object.assign({}, this.styleNormalizer);
-        if(element.props.style) {
-            elementStyle = Object.assign(elementStyle, element.props.style);
-        }
         elementStyle = Object.assign(elementStyle, {
             width: "100%",
             height: "auto",
             opacity: this.props.inView && this.state.loaded ? 1 : 0,
             transition: "opacity 300ms linear",
             cursor: element.props.onClick ? "pointer" : "default",
+            boxSizing: "border-box",
             WebkitTransform: "translateZ(0)", //GPU-acceleration, does it help?
             transform: "translateZ(0)"
         });
+        if(element.props.style) {
+            elementStyle = Object.assign(elementStyle, element.props.style);
+        }
 
         var elementProps = {
             className: this.classes(element.type).className,
             style: elementStyle,
-            onLoad: this.handleImageLoaded.bind(this),
+            onLoad: this.mediaTypes.indexOf(element.type) !== -1 ? this.handleImageLoaded.bind(this) : null,
             width: null, //nullify because it is not needed anymore
             height: null //nullify because it is not needed anymore
         }

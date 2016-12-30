@@ -70,9 +70,25 @@ class Demo extends React.Component {
             height: "80%"
         };
 
-        let elements = this.state.gifs.map( (gif, index) => {
+        const paragraphStyle = {
+            padding: "20px",
+            fontSize: "16px",
+            lineHeight: "1.5",
+            fontFamily: "helvetica, sans-serif",
+            backgroundColor: "white"
+        };
+
+        let elements = [];
+        let gifElements = this.state.gifs.map( (gif, index) => {
             return <img onClick={ e => window.open(gif.href, "_blank")} key={index} src={gif.src} width={gif.width} height={gif.height}/>;
         });
+
+        // elements.push(<p style={paragraphStyle} key={"korv1"}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In pulvinar sollicitudin nisi sit amet ultricies. Quisque eget mattis justo. Nulla elit justo, molestie sit amet erat quis, luctus pharetra enim. Nulla ut nisi egestas, gravida neque auctor, imperdiet sem. Donec id nibh eget leo efficitur ultricies. Suspendisse nibh odio, accumsan eu eleifend non, rutrum a erat. Suspendisse euismod interdum rhoncus. Maecenas a orci non lacus placerat feugiat at ut magna. Nam malesuada ipsum id aliquet tincidunt.</p>);
+        // elements.push(<p style={paragraphStyle} key={"korv2"}>korv</p>);
+        // elements.push(<p style={paragraphStyle} key={"korv3"}>korv</p>);
+        // elements.push(<p style={paragraphStyle} key={"korv4"}>korv</p>);
+
+        elements = elements.concat(gifElements);
 
         return (
             <div style={style}>

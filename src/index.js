@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import BEMHelper from "react-bem-helper";
 import getUnit from "get-unit";
 import elementResizeDetector from "element-resize-detector";
@@ -6,7 +7,7 @@ import throttle from "lodash.throttle";
 
 import PyramidElement from "./PyramidElement";
 
-export default class Pyramid extends React.Component {
+export default class Pyramid extends React.PureComponent {
     static propTypes = { 
         numberOfColumns: React.PropTypes.object,
         magicValues: React.PropTypes.object,
@@ -46,42 +47,8 @@ export default class Pyramid extends React.Component {
         // Create a BEMHelper.
         this.classes = new BEMHelper(props.className);
 
-        // Create initial state.
-        this.state = {
-            pyramidWidth: null,
-            allElementProps: []
-        }
-    }
-
-    reRender() {
-        this.forceUpdate();
-    }
-
-    componentDidMount() {
-        // Trigger rerenderings on resize events, using elementResizeDetector by mister Wnr ^^
-        this.erd.listenTo(this.refs.pyramid, this.reRender.bind(this));
-
-        // Trigger rerenderings on scroll events, throttled.
-        this.refs.pyramid.addEventListener('scroll', throttle(this.reRender.bind(this), 40), false);
-    }
-
-    componentWillUnmount() {
-        // Remove all event listeners
-        this.erd.removeAllListeners(this.refs.pyramid);
-        this.refs.pyramid.removeEventListener('scroll', this.reRender, true);
-    }
-
-    render() {
-        // If the ref "pyramid" exists, then an empty Pyramid has been mounted.
-        // We can now determine the width of the Pyramid.
-        if(this.refs.pyramid) {
-            // Measure the width of the Pyramid and store it in state.
-            this.state.pyramidWidth = this.refs.pyramid.clientWidth;
-        }
-
         // Initial styling
-        // Todo: should this be placed in this?
-        let pyramidStyle = {
+        this.style = {
             display: "block",
             position: "relative",
             width: "100%",
@@ -92,15 +59,81 @@ export default class Pyramid extends React.Component {
 
         // If the Pyramid has a style property set,
         // assign it over the initial styling.
-        if(this.props.style){
-            Object.assign(pyramidStyle, this.props.style);
+        if(props.style){
+            Object.assign(this.style, props.style);
+        }
+
+        // Create initial state.
+        this.state = {
+            pyramidWidth: null,
+            allElementProps: []
+            // WIP
+            ,measurements: {},
+            remeasurementsNeeded: false
+        }
+    }
+
+    componentDidMount() {
+        // Trigger rerenderings on resize events, using elementResizeDetector by mister Wnr ^^
+        this.erd.listenTo(false, this.refs.pyramid, this.handleResize.bind(this));
+
+        // Trigger rerenderings on scroll events, throttled.
+        this.refs.pyramid.addEventListener('scroll', throttle(this.handleScroll.bind(this), 40), false);
+    }
+
+    componentWillUnmount() {
+        // Remove all event listeners
+        this.erd.removeAllListeners(this.refs.pyramid);
+        this.refs.pyramid.removeEventListener('scroll', this.handleScroll, true);
+    }
+
+    // WIP
+    componentDidUpdate() {
+        // console.log("componentDidUpdate");
+
+        if(typeof this.state.measurementsNeeded === "number") {
+            if(!this.allMeasurmentsHaveBeenMade() || this.state.remeasurementsNeeded) {
+                this.makeMeasurements();
+            }
+        }
+    }
+
+    handleElementClick(index, event) {
+        if(this.props.onElementClick) {
+            this.props.onElementClick(this.state.allElementProps[index], event);
+        }
+    }
+
+    handleResize(event) {
+        // this.state.remeasurementsNeeded = true;
+        // this.reRender();
+
+        this.setState({
+            remeasurementsNeeded: true
+        });
+    }
+
+    handleScroll(event) {
+        this.reRender();
+    }
+
+    reRender() {
+        this.forceUpdate();
+    }
+
+    render() {
+        // If the ref "pyramid" exists, then an empty Pyramid has been mounted.
+        // We can now determine the width of the Pyramid.
+        if(this.refs.pyramid) {
+            // Measure the width of the Pyramid and store it in state.
+            this.state.pyramidWidth = this.refs.pyramid.clientWidth;
         }
 
         // If the width of the Pyramid is undefined (which it will be on first render pass),
         // render out an empty Pyramid.
         if(this.state && !this.state.pyramidWidth) {            
             return (
-                <div ref="pyramid" style={pyramidStyle} {...this.classes()}></div>
+                <div ref="pyramid" style={this.style} {...this.classes()}></div>
             )
         }
 
@@ -145,6 +178,22 @@ export default class Pyramid extends React.Component {
             }
         }
 
+        // Define class for elements using BEMHelper (defaults to pyramid__element)
+        let elementClassName = this.classes("element").className;
+
+        // Define the width of the elements
+        // All the elements get the same width, (pyramidWidth - Gutters) / Cols.
+        let elementWidth = (this.state.pyramidWidth - (numberOfColumns + 1) * this.props.gutter ) / numberOfColumns;
+
+        // WIP
+        if(typeof this.state.measurementsNeeded === "undefined" || !this.allMeasurmentsHaveBeenMade()) {
+            // console.log("measurementsNeeded undefined, measurements needed!")
+            return (
+                <div ref="pyramid" style={this.style} {...this.classes()}>
+                    {this.getElementsForMeasurment(elementWidth, elementClassName)}
+                </div>
+            );
+        }
 
         // Let's create The Elements of the Pyramid.
         // ("The Elements of the Pyramid"? Lol, sound like a sequel to Luc Besson's "The Fifth Element" ^^)
@@ -158,6 +207,8 @@ export default class Pyramid extends React.Component {
                         return false;
 
                     default:
+                        // WIP
+                        return true;
                         throw new Error("Element type  '" + element.type + "' is not supported. Pyramid, currently only supports img, video and iframe. But don't worry, it will fully support all kinds of elements soon! (the nut is tougher too crack than meets the eye)");
                         return false;
                 }
@@ -165,15 +216,19 @@ export default class Pyramid extends React.Component {
                 return true;
             }
         }).map( (element, index, elements) => {
-            // Define class for elements using BEMHelper (defaults to pyramid__element)
-            let elementClassName = this.classes("element").className;
+            // Declare the height of the element.
+            let elementHeight;
 
-            // Define the width of the elements
-            // All the elements get the same width, (pyramidWidth - Gutters) / Cols.
-            let elementWidth = (this.state.pyramidWidth - (numberOfColumns + 1) * this.props.gutter ) / numberOfColumns;
+            // WIP
+            if(this.state.measurements[index]) {
+                let measuredWidth = this.state.measurements[index].width;
+                let measuredHeight = this.state.measurements[index].height;
 
-            // Determine the height of the element.
-            let elementHeight = (elementWidth / element.props.width) * element.props.height;
+                elementHeight = (elementWidth / measuredWidth) * measuredHeight;
+            } else {
+                // this.addMeasurement(index, element.props.width, element.props.height);
+                elementHeight = (elementWidth / element.props.width) * element.props.height;
+            }
 
             // Let's set the inital props using what we know thus far.
             let elementProps = {
@@ -230,7 +285,7 @@ export default class Pyramid extends React.Component {
             // Bind it to the click event of all pyramid elements (event is set on the container, not the element)
             // Can be useful if one wants to give all elements the same event.
             if(this.props.onElementClick) {
-                elementProps.onClick = this.handleClick.bind(this, index);
+                elementProps.onClick = this.handleElementClick.bind(this, index);
             }
 
             // Save the element properties to an array in state.
@@ -239,7 +294,7 @@ export default class Pyramid extends React.Component {
 
             // Finally! Let's return our pyramid element. 
             return (
-                <PyramidElement className={elementClassName} key={index} {...elementProps}>
+                <PyramidElement ref={"element" + index} className={elementClassName} key={index} {...elementProps}>
                     {element}
                 </PyramidElement>
             )
@@ -248,16 +303,88 @@ export default class Pyramid extends React.Component {
         // Now that we have The Elements of the Pyramid™®
         // let us render the Pyramid.
         return (
-            <div ref="pyramid" style={pyramidStyle} {...this.classes()}>
+            <div ref="pyramid" style={this.style} {...this.classes()}>
                 {elements}
+                {this.getElementsForMeasurment(elementWidth, elementClassName)}
             </div>
         );
     }
 
-    handleClick(index, event) {
-        if(this.props.onElementClick) {
-            this.props.onElementClick(this.state.allElementProps[index], event);
+    makeMeasurements() {
+        for (var index = 0; index < this.state.measurementsNeeded; index++) {
+            let ref = "measurement" + index;
+            let domElement = ReactDOM.findDOMNode(this.refs[ref]);
+
+            // measure height
+            let height = domElement.clientHeight;
+            let width = domElement.clientWidth;
+
+            //add measurement
+            this.addMeasurement(index, width, height);
         }
+
+        this.setState({
+            remeasurementsNeeded: false
+        });
+    }
+
+    addMeasurement(index, width, height) {
+        if(!this.state.measurements[index]) {
+            this.state.measurements[index] = {};
+        }
+
+        this.state.measurements[index].width = width;
+        this.state.measurements[index].height = height;
+
+        console.log("Measured index:", index);
+        console.log("Measured width:", width);
+        console.log("Measured height:", height);
+
+        // console.dir(this.state.measurements);
+    }
+
+    allMeasurmentsHaveBeenMade() {
+        if(typeof this.state.measurementsNeeded === "undefined") {
+            throw new Error("Dont know how many measurments are needed. 'this.state.measurementsNeeded' is undefined.");
+            return false;
+        }
+
+        if(this.state.measurementsNeeded === Object.keys(this.state.measurements).length) {
+            // console.log('allMeasurmentsHaveBeenMade', true);
+            return true;
+        } else {
+            // console.log('allMeasurmentsHaveBeenMade', false);
+            return false;
+        }
+    }
+
+    getElementsForMeasurment(elementWidth, elementClassName) {
+        // console.log("getElementsForMeasurment");
+
+        this.state.measurementsNeeded = 0;
+        let measurmentElements = [];
+
+        let elementProps = {
+            width: elementWidth,
+            height: "auto"
+        }
+
+        for (let index = 0; index < this.props.children.length; index++) {
+            let element = this.props.children[index];
+            let ref = "measurement" + index;
+
+            if(!element.props.width || !element.props.height) {
+                this.state.measurementsNeeded += 1;
+
+                measurmentElements.push(
+                    <PyramidElement ref={ref} style={{visibility: "hidden", zIndex: -1000}} className={elementClassName} key={index} {...elementProps}>
+                        {element}
+                    </PyramidElement>
+                );
+            }
+        }
+
+        return measurmentElements;
     }
 
 }
