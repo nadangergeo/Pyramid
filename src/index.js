@@ -66,10 +66,8 @@ export default class Pyramid extends React.PureComponent {
         // Create initial state.
         this.state = {
             pyramidWidth: null,
-            allElementProps: []
-            // WIP
-            ,measurements: {},
-            remeasurementsNeeded: false
+            allElementProps: [],
+            measurements: {}
         }
     }
 
@@ -105,12 +103,13 @@ export default class Pyramid extends React.PureComponent {
     }
 
     handleResize(event) {
-        // this.state.remeasurementsNeeded = true;
-        // this.reRender();
+        this.state.remeasurementsNeeded = true;
+        this.reRender();
 
-        this.setState({
-            remeasurementsNeeded: true
-        });
+        // this also works, but the code above is more explicit, no?
+        // this.setState({
+        //     remeasurementsNeeded: true
+        // });
     }
 
     handleScroll(event) {
@@ -118,6 +117,7 @@ export default class Pyramid extends React.PureComponent {
     }
 
     reRender() {
+        // console.log("RERENDER!!!");
         this.forceUpdate();
     }
 
@@ -185,9 +185,9 @@ export default class Pyramid extends React.PureComponent {
         // All the elements get the same width, (pyramidWidth - Gutters) / Cols.
         let elementWidth = (this.state.pyramidWidth - (numberOfColumns + 1) * this.props.gutter ) / numberOfColumns;
 
-        // WIP
+        // Do we need to make some intial measurements?
+        // We need to know the height of elements with a dynamic/unknown aspect ratio before our first real render.
         if(typeof this.state.measurementsNeeded === "undefined" || !this.allMeasurmentsHaveBeenMade()) {
-            // console.log("measurementsNeeded undefined, measurements needed!")
             return (
                 <div ref="pyramid" style={this.style} {...this.classes()}>
                     {this.getElementsForMeasurment(elementWidth, elementClassName)}
@@ -219,14 +219,20 @@ export default class Pyramid extends React.PureComponent {
             // Declare the height of the element.
             let elementHeight;
 
-            // WIP
+            // If the dimensions of the element have been measured
             if(this.state.measurements[index]) {
+                // get measurments
                 let measuredWidth = this.state.measurements[index].width;
                 let measuredHeight = this.state.measurements[index].height;
 
+                // use measurements to determine height
                 elementHeight = (elementWidth / measuredWidth) * measuredHeight;
+
+                // just use measuredHeight directly???
+                // console.log("same same?", elementHeight === measuredHeight);
             } else {
-                // this.addMeasurement(index, element.props.width, element.props.height);
+                // otherwise, calculate height using the dimensions in props
+                // which MUST exist in this scope. The logic holds, trust me.
                 elementHeight = (elementWidth / element.props.width) * element.props.height;
             }
 
@@ -282,7 +288,7 @@ export default class Pyramid extends React.PureComponent {
             }
 
             // If the Pyramid has the prop 'onElementClick' set,
-            // Bind it to the click event of all pyramid elements (event is set on the container, not the element)
+            // Bind it to the click event of all pyramid elements (note: event is set on the container, not the element)
             // Can be useful if one wants to give all elements the same event.
             if(this.props.onElementClick) {
                 elementProps.onClick = this.handleElementClick.bind(this, index);
@@ -310,9 +316,15 @@ export default class Pyramid extends React.PureComponent {
         );
     }
 
+    // Measurement methods
+    // ---------------------------
+
     makeMeasurements() {
+        // Iterate through the hidden measurement elements
         for (var index = 0; index < this.state.measurementsNeeded; index++) {
+            //the ref, same pattern as when made by getElementsForMeasurment()
             let ref = "measurement" + index;
+            //get the dom element
             let domElement = ReactDOM.findDOMNode(this.refs[ref]);
 
             // measure height
@@ -323,32 +335,37 @@ export default class Pyramid extends React.PureComponent {
             this.addMeasurement(index, width, height);
         }
 
+        // set remeasurementsNeeded to false, which also triggers a (needed) render
         this.setState({
             remeasurementsNeeded: false
         });
     }
 
     addMeasurement(index, width, height) {
+        // add empty measurement object for element,
+        // with index as key
         if(!this.state.measurements[index]) {
             this.state.measurements[index] = {};
         }
 
+        // set width and height props to measurment object
         this.state.measurements[index].width = width;
         this.state.measurements[index].height = height;
 
-        console.log("Measured index:", index);
-        console.log("Measured width:", width);
-        console.log("Measured height:", height);
-
+        // console.log("Measured index:", index);
+        // console.log("Measured width:", width);
+        // console.log("Measured height:", height);
         // console.dir(this.state.measurements);
     }
 
     allMeasurmentsHaveBeenMade() {
+        // Todo: is this really needed?
         if(typeof this.state.measurementsNeeded === "undefined") {
             throw new Error("Dont know how many measurments are needed. 'this.state.measurementsNeeded' is undefined.");
             return false;
         }
 
+        // if the measurements needed is equal to the number of measurements made
         if(this.state.measurementsNeeded === Object.keys(this.state.measurements).length) {
             // console.log('allMeasurmentsHaveBeenMade', true);
             return true;
@@ -366,16 +383,23 @@ export default class Pyramid extends React.PureComponent {
 
         let elementProps = {
             width: elementWidth,
-            height: "auto"
+            height: "auto" //to let the browser do the measurement for us
         }
 
+        // Iterate through the elements
         for (let index = 0; index < this.props.children.length; index++) {
+            // Get the element
             let element = this.props.children[index];
+
+            // The ref, same pattern as when made by makeMeasurements()
             let ref = "measurement" + index;
 
+            // Does the element need measurements?
             if(!element.props.width || !element.props.height) {
+                // Increment measurementsNeeded
                 this.state.measurementsNeeded += 1;
 
+                // Create and push hiddden pyramid element for measurement
                 measurmentElements.push(
                     <PyramidElement ref={ref} style={{visibility: "hidden", zIndex: -1000}} className={elementClassName} key={index} {...elementProps}>
                         {element}
@@ -384,6 +408,7 @@ export default class Pyramid extends React.PureComponent {
             }
         }
 
+        // Finally, return the hidden elments for measurement
         return measurmentElements;
     }
 
