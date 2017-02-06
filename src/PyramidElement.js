@@ -3,19 +3,29 @@ import BEMHelper from "react-bem-helper";
 
 class PyramidElement extends React.PureComponent {
     static propTypes = { 
-        width: React.PropTypes.number.isRequired,
+        width: React.PropTypes.oneOfType([
+                    React.PropTypes.string,
+                    React.PropTypes.number
+                ]).isRequired,
         height: React.PropTypes.oneOfType([
                     React.PropTypes.string,
                     React.PropTypes.number
                 ]).isRequired,
         top: React.PropTypes.number,
         left: React.PropTypes.number,
+        zIndex: React.PropTypes.oneOfType([
+                    React.PropTypes.string,
+                    React.PropTypes.number
+                ]).isRequired,
         type: React.PropTypes.string,
         style: React.PropTypes.object,
         className: React.PropTypes.string,
         transition: React.PropTypes.string,
         inView: React.PropTypes.bool,
-        onClick: React.PropTypes.func
+        onClick: React.PropTypes.func,
+        zoomedIn: React.PropTypes.bool,
+        zoomingIn: React.PropTypes.bool,
+        zoomingOut: React.PropTypes.bool
     };
 
     static defaultProps = { 
@@ -23,11 +33,15 @@ class PyramidElement extends React.PureComponent {
         height: 0,
         top: 0,
         left: 0,
+        zIndex: "auto",
         type: "img",
         className: "element",
         transition: "none",
         inView: true,
-        onClick: null
+        onClick: null,
+        zoomedIn: false,
+        zoomingIn: false,
+        zoomingOut: false
     };
 
     constructor(props) {
@@ -52,26 +66,35 @@ class PyramidElement extends React.PureComponent {
         containerStyle = Object.assign(containerStyle, {
             backgroundColor: "rgba(0,0,0,0.1)",
             display: "block",
-            width: this.props.width + "px",
+            width: isNaN(this.props.width) ? this.props.width : this.props.width + "px",
             height: isNaN(this.props.height) ? this.props.height : this.props.height + "px",
             position: "absolute",
             top: this.props.top,
             left: this.props.left,
+            zIndex: this.props.zIndex,
             transition: this.props.transition,
-            marginBottom: this.props.marginBottom + "px",
             cursor: this.props.onClick ? "pointer" : "default"
         });
+
         if(this.props.style) {
             containerStyle = Object.assign(containerStyle, this.props.style);
+        }
+
+        if(this.props.zoomedIn || this.props.zoomingIn) {
+            containerStyle = Object.assign(containerStyle, {
+                overflowY: "auto",
+                MsOverflowStyle: "-ms-autohiding-scrollbar",
+                WebkitOverflowScrolling: "touch"
+            });
         }
 
         let elementStyle = Object.assign({}, this.styleNormalizer);
         elementStyle = Object.assign(elementStyle, {
             width: "100%",
-            height: "auto",
+            height: this.mediaTypes.indexOf(this.props.children.type) !== -1 && !this.props.zoomedIn && !this.props.zoomingIn && !this.props.zoomingOut ? "100%" : "auto",
             opacity: this.props.inView && this.state.loaded ? 1 : 0,
             transition: "opacity 300ms linear",
-            cursor: element.props.onClick ? "pointer" : "default",
+            cursor: element.props.onClick ? "pointer" : "inherit",
             boxSizing: "border-box",
             WebkitTransform: "translateZ(0)", //GPU-acceleration, does it help?
             transform: "translateZ(0)"
@@ -85,7 +108,16 @@ class PyramidElement extends React.PureComponent {
             style: elementStyle,
             onLoad: this.mediaTypes.indexOf(element.type) !== -1 ? this.handleImageLoaded.bind(this) : null,
             width: null, //nullify because it is not needed anymore
-            height: null //nullify because it is not needed anymore
+            height: null, //nullify because it is not needed anymore 
+        }
+
+        // if(element.props.src && element.props.src.slice(-3) === "gif") {
+        // }
+
+        if(typeof element.type === "function") {
+            elementProps.zoomedIn = this.props.zoomedIn;
+            elementProps.zoomingIn = this.props.zoomingIn;
+            elementProps.zoomingOut = this.props.zoomingOut;
         }
 
         element = React.cloneElement(element, elementProps);
