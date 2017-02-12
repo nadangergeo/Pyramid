@@ -20,7 +20,8 @@ export default class Giphy extends React.Component {
         this.erd = props.erd || elementResizeDetector({strategy: "scroll"});
 
         this.state = {
-            gifs: []
+            gifs: [],
+            hideSearch: false
         }
     }
 
@@ -49,6 +50,18 @@ export default class Giphy extends React.Component {
 
     handleSearchClick(event) {
         event.stopPropagation();
+    }
+
+    handlePyramidWillZoomIn(event) {
+        this.setState({
+            hideSearch: true
+        });
+    }
+
+    handlePyramidWillZoomOut(event) {
+        this.setState({
+            hideSearch: false
+        });
     }
 
     search(searchQuery) {
@@ -90,60 +103,24 @@ export default class Giphy extends React.Component {
     }
 
     render() {
-        let coverStyle = {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0,
-            zIndex: 1000,
-            display: "flex",
-            height: "100%",
-            overflow: "hidden",
-            backgroundColor: "#000",
-            color: "#fff",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: 1,
-            transition: "all 200ms linear"
-        };
-
-        let headerStyle = {
-            display: "block",
-            textAlign: "center",
-            fontSize: "10vw", 
-            letterSpacing: "-0.05em"
-        }
-
-        if(this.props.zoomingIn || this.props.zoomedIn) {
-            coverStyle.opacity = 0;
-        }
+        let demoStyle = {},
+             coverStyle = {},
+             headerStyle = {};
 
         if(this.props.zoomedIn) {
+            coverStyle.opacity = 0;
             coverStyle.zIndex = -1000;
         }
 
-        let wrapperStyle = {
-            position: "relative",
-            width: "100%",
-            height: "100%",
-            overflow: "hidden",
-            backgroundColor: "#ccc",
-        };
-
         let pyramidStyle = {
-            height: "calc(100% - 120px)",
-            top: "120px"
+            height: this.state.hideSearch ? "100%" : "calc(100% - 120px)",
+            top: this.state.hideSearch ? "0px" : "120px",
         };
 
         let inputContainerStyle = {
-            opacity: 0,
-            transition: "all 200ms linear"
+            top: this.state.hideSearch ? "-120px" : "0px",
+            opacity: this.props.zoomedIn ? 1 : 0
         };
-
-        if(this.props.zoomedIn) {
-            inputContainerStyle.opacity = 1;
-        }
 
         let elements = this.state.gifs.map( (gif, index) => {
             return <img center key={index} src={gif.src} width={gif.width} height={gif.height}/>;
@@ -151,8 +128,18 @@ export default class Giphy extends React.Component {
 
         let gifPyramid;
         if(this.props.zoomedIn || this.props.zoomingIn || this.props.zoomingOut){
+            let props = {
+                erd: this.erd,
+                onWillZoomIn: this.handlePyramidWillZoomIn.bind(this),
+                onWillZoomOut: this.handlePyramidWillZoomOut.bind(this),
+                transition: "all 200ms cubic-bezier(.63,-0.43,.33,1.41)",
+                zoomable: true,
+                style: pyramidStyle,
+                derenderIfNotInViewAnymore: true
+            }
+
             gifPyramid = (
-                <Pyramid erd={this.erd} transition="all 200ms cubic-bezier(.63,-0.43,.33,1.41)" zoomable={true} style={pyramidStyle} derenderIfNotInViewAnymore={true}>
+                <Pyramid {...props}>
                     {elements}
                 </Pyramid>
             );
@@ -161,9 +148,9 @@ export default class Giphy extends React.Component {
         }
 
         return (
-            <div style={wrapperStyle}>
-                <div style={coverStyle}>
-                    <h1 style={headerStyle}>Giphy</h1>
+            <div className="demo" style={demoStyle}>
+                <div className="demo__cover" style={coverStyle}>
+                    <h1 className="demo__header" style={headerStyle}>Giphy</h1>
                 </div>
 
                 <div style={inputContainerStyle} className="input-container">

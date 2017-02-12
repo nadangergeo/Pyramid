@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import BEMHelper from "react-bem-helper";
+import elementResizeDetector from "element-resize-detector";
 import transitionUtility from "transition-utility";
 
 class PyramidElement extends React.PureComponent {
@@ -15,11 +16,12 @@ class PyramidElement extends React.PureComponent {
                 ]).isRequired,
         top: React.PropTypes.number,
         left: React.PropTypes.number,
-        type: React.PropTypes.string,
         style: React.PropTypes.object,
         className: React.PropTypes.string,
         transition: React.PropTypes.string,
         inView: React.PropTypes.bool,
+        erd: React.PropTypes.object,
+        zoomable: React.PropTypes.bool,
         onWillZoomIn: React.PropTypes.func,
         onWillZoomOut: React.PropTypes.func,
         onDidZoomIn: React.PropTypes.func,
@@ -31,10 +33,10 @@ class PyramidElement extends React.PureComponent {
         height: 0,
         top: 0,
         left: 0,
-        type: "img",
         className: "element",
         transition: "none",
         inView: true,
+        zoomable: false,
         zoomedIn: false,
         zoomingIn: false,
         zoomingOut: false
@@ -42,6 +44,9 @@ class PyramidElement extends React.PureComponent {
 
     constructor(props) {
         super(props);
+
+        // Create a elementResizeDetector.
+        this.erd = props.erd || elementResizeDetector({strategy: "scroll"});
 
         this.classes = new BEMHelper(props.className);
 
@@ -64,7 +69,7 @@ class PyramidElement extends React.PureComponent {
 
         if(!this.isMediaType()) {
             console.log("listening to resize");
-            this.props.erd.listenTo((this.props.height === "auto"), element, this.handleResize.bind(this));
+            this.erd.listenTo((this.props.height === "auto"), element, this.handleResize.bind(this));
         }
 
         this.transitionEndEventFunction = this.handleTransitionEnd.bind(this);
@@ -76,7 +81,7 @@ class PyramidElement extends React.PureComponent {
 
         // Remove all event listeners
         if(element) {
-            this.props.erd.removeAllListeners(element);
+            this.erd.removeAllListeners(element);
         }
         this.refs.elementContainer.removeEventListener(transitionUtility.getEndEvent(), this.transitionEndEventFunction, false);
     }
@@ -176,7 +181,6 @@ class PyramidElement extends React.PureComponent {
             zoomingOut: false,
         });
 
-        console.log(this.props.height);
         if(!this.isMediaType()) {
             this.props.onResize(this.props.index, this.props.width, this.props.height);
         }
@@ -230,7 +234,7 @@ class PyramidElement extends React.PureComponent {
         let containerProps = {
             style: containerStyle,
             className: this.classes().className,
-            onClick: this.state.zoomedIn ? this.zoomOut.bind(this) : this.zoomIn.bind(this)
+            onClick: this.props.zoomable ? this.state.zoomedIn ? this.zoomOut.bind(this) : this.zoomIn.bind(this) : null
         }
 
         // Element
@@ -257,13 +261,14 @@ class PyramidElement extends React.PureComponent {
             onLoad: this.isMediaType() ? this.handleImageLoaded.bind(this) : null,
             width: null, //nullify because it is not needed anymore
             height: null, //nullify because it is not needed anymore
-            ref: element.ref ? element.ref : "element"
+            ref: element.ref ? element.ref : "element",
         }
 
         if(this.isReactElement()) {
             elementProps.zoomedIn = this.state.zoomedIn;
             elementProps.zoomingIn = this.state.zoomingIn;
             elementProps.zoomingOut = this.state.zoomingOut;
+            elementProps.erd = this.erd;
         }
 
         this.element = React.cloneElement(element, elementProps);

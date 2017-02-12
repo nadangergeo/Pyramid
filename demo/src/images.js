@@ -30,49 +30,16 @@ export default class Images extends React.Component {
     }
 
     render() {
-            let coverStyle = {
-                position: "absolute",
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                zIndex: 500,
-                display: "flex",
-                height: "100%",
-                overflow: "hidden",
-                // backgroundColor: "#fdcb24",
-                backgroundColor: "#000",
-                color: "#fff",
-                alignItems: "center",
-                justifyContent: "center",
-                opacity: 1,
-                transition: "all 200ms linear"
-            };
-
-            let headerStyle = {
-                display: "block",
-                textAlign: "center",
-                fontSize: "10vw", 
-                letterSpacing: "-0.05em"
-            }
-
-            if(this.props.zoomingIn || this.props.zoomedIn) {
-                coverStyle.opacity = 0;
-            }
+            let demoStyle = {},
+                 coverStyle = {},
+                 headerStyle = {};
 
             if(this.props.zoomedIn) {
+                coverStyle.opacity = 0;
                 coverStyle.zIndex = -1000;
             }
 
-            const wrapperStyle = {
-                position: "relative",
-                width: "100%",
-                height: "100%",
-                overflow: "hidden",
-                backgroundColor: "#ccc",
-            };
-
-            const pyramidStyle = {
+            let pyramidStyle = {
                 height: "100%",
                 backgroundColor: "#ccc"
             };
@@ -126,9 +93,9 @@ export default class Images extends React.Component {
             }
 
             return (
-                <div style={wrapperStyle}>
-                    <div style={coverStyle}>
-                        <h1 style={headerStyle}>Images</h1>
+                <div className="demo" style={demoStyle}>
+                    <div className="demo__cover" style={coverStyle}>
+                        <h1 className="demo__header" style={headerStyle}>Images</h1>
                     </div>
 
                     {imagesPyramid}
