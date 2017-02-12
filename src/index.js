@@ -10,16 +10,17 @@ import PyramidElement from "./PyramidElement";
 
 export default class Pyramid extends React.PureComponent {
     static propTypes = { 
-        numberOfColumns: React.PropTypes.object,
-        magicValues: React.PropTypes.object,
+        numberOfColumns: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.object]),
+        magicValue: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.object]),
         className: React.PropTypes.string,
-        gutter: React.PropTypes.number,
-        padding: React.PropTypes.number,
+        gutter: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.object]),
+        padding: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.object]),
         transition: React.PropTypes.string,
         derenderIfNotInViewAnymore: React.PropTypes.bool,
         style: React.PropTypes.object,
         onElementClick: React.PropTypes.func,
-        zoomable: React.PropTypes.bool
+        zoomable: React.PropTypes.bool,
+        scroller: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.object])
     };
 
     static defaultProps = { 
@@ -32,15 +33,14 @@ export default class Pyramid extends React.PureComponent {
                 "1440px" : 5 
             }
         },
-        magicValues: {
-            default: 0
-        },
+        magicValue: 0,
         className: "pyramid",
         gutter: 20,
         padding: 20,
         transition: "none",
         derenderIfNotInViewAnymore: false,
-        zoomable: false
+        zoomable: false,
+        scroller: true
     };
 
     constructor(props) {
@@ -57,11 +57,8 @@ export default class Pyramid extends React.PureComponent {
             display: "block",
             position: "relative",
             width: "100%",
-            height: "100%",
-            clear: "both",
-            overflowY: "auto",
-            MsOverflowStyle: "-ms-autohiding-scrollbar",
-            WebkitOverflowScrolling: "touch"
+            height: "auto",
+            clear: "both"
         }
 
         // If the Pyramid has a style property set,
@@ -70,41 +67,42 @@ export default class Pyramid extends React.PureComponent {
             this.style = Object.assign(this.style, props.style);
         }
 
+        this.pyramidWidth = null;
+        this.allElementProps = [];
+        
         // Create initial state.
         this.state = {
-            pyramidWidth: null,
-            allElementProps: [],
-            measurements: {},
             zoomedIn: false,
             zoomingIn: false,
             zoomingOut: false,
-            zoomElementIndex: null
+            zoomElementIndex: null,
+            measurements: {}
         }
     }
 
     componentDidMount() {
+        this.mounted = true;
+
         // Trigger rerenderings on resize events, using elementResizeDetector by mister Wnr ^^
         this.erd.listenTo(false, this.refs.pyramid, this.handleResize.bind(this));
 
         // Trigger rerenderings on scroll events, throttled.
-        this.refs.pyramid.addEventListener('scroll', throttle(this.handleScroll.bind(this), 50), false);
+        this.scrollEventFunction = this.handleScroll.bind(this);
+        this.throttledScrollEventFunction = throttle(this.scrollEventFunction, 50);
+        this.getScroller().addEventListener('scroll', this.throttledScrollEventFunction, true);
     }
 
     componentWillUnmount() {
+        this.mounted = false;
+
         // Remove all event listeners
         this.erd.removeAllListeners(this.refs.pyramid);
-        this.refs.pyramid.removeEventListener('scroll', this.handleScroll, true);
+        this.getScroller().removeEventListener('scroll', this.throttledScrollEventFunction, true);
     }
 
     // WIP
     componentDidUpdate() {
         // console.log("componentDidUpdate");
-
-        if(typeof this.state.measurementsNeeded === "number") {
-            if(!this.allMeasurmentsHaveBeenMade() || this.state.remeasurementsNeeded) {
-                this.makeMeasurements();
-            }
-        }
 
         if(this.state.zoomingIn) {
             ReactDOM.findDOMNode(this.refs["element" + this.state.zoomElementIndex]).addEventListener(transitionUtility.getEndEvent(), this.zoomInEnd.bind(this));
@@ -117,24 +115,73 @@ export default class Pyramid extends React.PureComponent {
         // console.log("zoomingOut", this.state.zoomingOut);
     }
 
+    getScroller() {
+        if(this.scroller) {
+            return this.scroller;
+        } else if(typeof this.props.scroller === "object") {
+            return this.scroller = this.props.scroller;
+        } else if(this.props.scroller === true) {
+            return this.scroller = this.refs.pyramid;
+        } else {
+            let scroller;
+            let el = this.refs.pyramid;
+            let found = false;
+
+            while(!found) {
+                el = el.parentNode;
+
+                if(el === document.querySelector('body')) {
+                    found = true;
+                    scroller = window;
+                } else if(el.clientHeight < el.scrollHeight) {
+                    found = true;
+                    scroller = el;
+                }
+            }
+
+            return this.scroller = scroller;
+        } 
+    }
+
     handleElementClick(index, event) {
         if(this.props.onElementClick) {
-            this.props.onElementClick(this.state.allElementProps[index], event);
+            this.props.onElementClick(this.allElementProps[index], event);
         }
     }
 
     handleResize(event) {
-        this.state.remeasurementsNeeded = true;
         this.reRender();
-
-        // this also works, but the code above is more explicit, no?
-        // this.setState({
-        //     remeasurementsNeeded: true
-        // });
     }
 
     handleScroll(event) {
         this.reRender();
+    }
+
+    isInView(top, height, magicValue) {
+        // If the element is in view (or close to using magic value).
+        // One could say this is mathemagic.
+
+        let scroller = this.getScroller();
+        let magic = (magicValue * this.refs.pyramid.offsetHeight);
+        let scrollerHeight = scroller.offsetHeight || scroller.innerHeight;
+        let offsetTop = this.props.scroller ? 0 : this.refs.pyramid.offsetTop;
+        let scrollTop = scroller === window ? scroller.pageYOffset : scroller.scrollTop;
+
+        if(
+            ( top + magic > scrollTop - offsetTop
+              &&
+              top < ( scrollTop + scrollerHeight - offsetTop) + magic
+            )
+            ||
+            ( (top + height) + magic > scrollTop - offsetTop
+              &&
+              top + height < (scrollTop + scrollerHeight - offsetTop) + magic
+            )
+        ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     zoom(index, event) {
@@ -157,31 +204,37 @@ export default class Pyramid extends React.PureComponent {
     }
 
     zoomInEnd(event) {
-        console.log("zoomInEnd!");
+        if (event.propertyName === "width") {
+            console.log("zoomInEnd!");
 
-        this.setState({
-            zoomedIn: true,
-            zoomingIn: false,
-            zoomingOut: false
-        });
+            this.setState({
+                zoomedIn: true,
+                zoomingIn: false,
+                zoomingOut: false
+            });
+        }
     }
 
     zoomOutEnd(event) {
-        console.log("zoomOutEnd!");
+        if (event.propertyName === "width") {
+            console.log("zoomOutEnd!");
 
-        this.setState({
-            zoomedIn: false,
-            zoomingIn: false,
-            zoomingOut: false
-        });
+            this.setState({
+                zoomedIn: false,
+                zoomingIn: false,
+                zoomingOut: false
+            });
 
-        ReactDOM.findDOMNode(this.refs["element" + this.state.zoomElementIndex]).removeEventListener(transitionUtility.getEndEvent(), this.zoomOutEnd.bind(this));
-        ReactDOM.findDOMNode(this.refs["element" + this.state.zoomElementIndex]).removeEventListener(transitionUtility.getEndEvent(), this.zoomInEnd.bind(this));
+            ReactDOM.findDOMNode(this.refs["element" + this.state.zoomElementIndex]).removeEventListener(transitionUtility.getEndEvent(), this.zoomOutEnd.bind(this));
+            ReactDOM.findDOMNode(this.refs["element" + this.state.zoomElementIndex]).removeEventListener(transitionUtility.getEndEvent(), this.zoomInEnd.bind(this));
+        }
     }
 
     reRender() {
         // console.log("RERENDER!!!");
-        this.forceUpdate();
+        if(this.mounted) {
+            this.forceUpdate();
+        }
     }
 
     render() {
@@ -189,55 +242,138 @@ export default class Pyramid extends React.PureComponent {
         // We can now determine the width of the Pyramid.
         if(this.refs.pyramid) {
             // Measure the width of the Pyramid and store it in state.
-            this.state.pyramidWidth = this.refs.pyramid.clientWidth;
+            this.pyramidWidth = this.refs.pyramid.clientWidth;
         }
 
         // If the width of the Pyramid is undefined (which it will be on first render pass),
+        // or if there are no elements
         // render out an empty Pyramid.
-        if(this.state && !this.state.pyramidWidth) {            
+        if((this.state && !this.pyramidWidth) || this.props.children.length === 0) {
+            let style = this.style;
+
+            // If this.props.scroller is false, make the Pyramid eventually overflow the scroller, 
+            // Assuming that if the scroller is not window, it will at least have the same height as window.
+            // This is so that getScroller() can determine the scroller.
+            if(this.props.scroller === false) {
+                style = Object.assign(style, {
+                    height: window.innerHeight + 1 + "px"
+                });
+            }
+
             return (
-                <div ref="pyramid" style={this.style} {...this.classes()}></div>
+                <div ref="pyramid" style={style} {...this.classes()}></div>
             )
         }
 
         // Let's figure out how many columns the Pyramid should have.
-        // Let it first be defined as the default value.
-        let numberOfColumns = this.props.numberOfColumns.default;
-        // Then let us iterate through all the breakpoints.
-        for(let key in this.props.numberOfColumns.breakpoints) {
-            // What unit was the breakpoint defined with?
-            let unit = getUnit(key);
+        let numberOfColumns;
+        if(typeof this.props.numberOfColumns === "number") {
+            numberOfColumns = this.props.numberOfColumns;
+        } else {
+            // Let it first be defined as the default value.
+            numberOfColumns = this.props.numberOfColumns.default;
+            // Then let us iterate through all the breakpoints.
+            for(let key in this.props.numberOfColumns.breakpoints) {
+                if (this.props.numberOfColumns.breakpoints.hasOwnProperty(key)) {
+                    // What unit was the breakpoint defined with?
+                    let unit = getUnit(key);
 
-            // Pyramid only supports pixels atm.
-            // Todo: support ems and % ?
-            if(unit !== "px") {
-                throw new Error("Pyramid does not support the unit '" + unit + "' in the property numberOfColumns. You could always help out to implement it and make a pull request ^^ Cheers!");
-            }
+                    // Pyramid only supports pixels atm.
+                    // Todo: support ems and % ?
+                    if(unit !== "px") {
+                        throw new Error("Pyramid does not support the unit '" + unit + "' for breakpoints in the property numberOfColumns. You could always help out to implement it and make a pull request ^^ Cheers!");
+                    }
 
-            // If the width of the Pyramid is greater or equal to the breakpoint, then...
-            if(this.state.pyramidWidth >= parseInt(key)) {
-                // set the number of columns to the number corresponding to the breakpoint
-                numberOfColumns = this.props.numberOfColumns.breakpoints[key];
+                    // If the width of the Pyramid is greater or equal to the breakpoint, then...
+                    if(this.pyramidWidth >= parseInt(key, 10)) {
+                        // set the number of columns to the number corresponding to the breakpoint
+                        numberOfColumns = this.props.numberOfColumns.breakpoints[key];
+                    }
+                }
             }
         }
 
-        // Let the magic value be intially defined as the default value.
-        let magicValue = this.props.magicValues.default;
-        // Then let us iterate through all the breakpoints.
-        for(let key in this.props.magicValues.breakpoints) {
-            // What unit was the breakpoint defined with?
-            let unit = getUnit(key);
+        // Let's determine the magic value.
+        let magicValue;
+        if(typeof this.props.magicValue === "number") {
+            magicValue = this.props.magicValue;
+        } else {
+            // Let the magic value be intially defined as the default value.
+            magicValue = this.props.magicValue.default;
+            // Then let us iterate through all the breakpoints.
+            for(let key in this.props.magicValue.breakpoints) {
+                if (this.props.magicValue.breakpoints.hasOwnProperty(key)) {
+                    // What unit was the breakpoint defined with?
+                    let unit = getUnit(key);
 
-            // Pyramid only supports pixels atm.
-            // Todo: support ems and % ?
-            if(unit !== "px") {
-                throw new Error("Pyramid does not support the unit '" + unit + "' in the property magicValues. You could always help out to implement it and make a pull request ^^ Cheers!");
+                    // Pyramid only supports pixels atm.
+                    // Todo: support ems and % ?
+                    if(unit !== "px") {
+                        throw new Error("Pyramid does not support the unit '" + unit + "' for breakpoints in the property magicValue. You could always help out to implement it and make a pull request ^^ Cheers!");
+                    }
+
+                    // If the width of the Pyramid is greater or equal to the breakpoint, then...
+                    if(this.pyramidWidth >= parseInt(key, 10)) {
+                        // set the magic value to the number corresponding to the breakpoint
+                        magicValue = this.props.magicValue.breakpoints[key];
+                    }
+                }
             }
+        }
 
-            // If the width of the Pyramid is greater or equal to the breakpoint, then...
-            if(this.state.pyramidWidth >= parseInt(key)) {
-                // set the magic value to the number corresponding to the breakpoint
-                magicValue = this.props.magicValues.breakpoints[key];
+        // Let's determine the padding.
+        let padding;
+        if(typeof this.props.padding === "number") {
+            padding = this.props.padding;
+        } else {
+            // Let the padding be intially defined as the default value.
+            padding = this.props.padding.default;
+            // Then let us iterate through all the breakpoints.
+            for(let key in this.props.padding.breakpoints) {
+                if (this.props.padding.breakpoints.hasOwnProperty(key)) {
+                    // What unit was the breakpoint defined with?
+                    let unit = getUnit(key);
+
+                    // Pyramid only supports pixels atm.
+                    // Todo: support ems and % ?
+                    if(unit !== "px") {
+                        throw new Error("Pyramid does not support the unit '" + unit + "' for breakpoints in the property padding. You could always help out to implement it and make a pull request ^^ Cheers!");
+                    }
+
+                    // If the width of the Pyramid is greater or equal to the breakpoint, then...
+                    if(this.pyramidWidth >= parseInt(key, 10)) {
+                        // set the magic value to the number corresponding to the breakpoint
+                        padding = this.props.padding.breakpoints[key];
+                    }
+                }
+            }
+        }
+
+        // Let's determine the gutter.
+        let gutter;
+        if(typeof this.props.gutter === "number") {
+            gutter = this.props.gutter;
+        } else {
+            // Let the gutter be intially defined as the default value.
+            gutter = this.props.gutter.default;
+            // Then let us iterate through all the breakpoints.
+            for(let key in this.props.gutter.breakpoints) {
+                if (this.props.gutter.breakpoints.hasOwnProperty(key)) {
+                    // What unit was the breakpoint defined with?
+                    let unit = getUnit(key);
+
+                    // Pyramid only supports pixels atm.
+                    // Todo: support ems and % ?
+                    if(unit !== "px") {
+                        throw new Error("Pyramid does not support the unit '" + unit + "' for breakpoints in the property gutter. You could always help out to implement it and make a pull request ^^ Cheers!");
+                    }
+
+                    // If the width of the Pyramid is greater or equal to the breakpoint, then...
+                    if(this.pyramidWidth >= parseInt(key, 10)) {
+                        // set the magic value to the number corresponding to the breakpoint
+                        gutter = this.props.gutter.breakpoints[key];
+                    }
+                }
             }
         }
 
@@ -246,59 +382,14 @@ export default class Pyramid extends React.PureComponent {
 
         // Define the width of the elements
         // All the elements get the same width, (pyramidWidth - Gutters - Padding) / Cols.
-        let elementWidth = (this.state.pyramidWidth - (numberOfColumns - 1) * this.props.gutter - 2 * this.props.padding) / numberOfColumns;
-
-        // Do we need to make some intial measurements?
-        // We need to know the height of elements with a dynamic/unknown aspect ratio before our first real render.
-        if(typeof this.state.measurementsNeeded === "undefined" || !this.allMeasurmentsHaveBeenMade()) {
-            return (
-                <div ref="pyramid" style={this.style} {...this.classes()}>
-                    {this.getElementsForMeasurment(elementWidth, elementClassName)}
-                </div>
-            );
-        }
-
-        //DERP
-        // if(this.state.zoomedIn) {
-        //     let index = this.state.zoomElementIndex;
-        //     let element = this.props.children[index];
-
-        //     let elementProps = {
-        //         position: "fixed",
-        //         top: 0,
-        //         left: 0,
-        //         width: "100%",
-        //         height: "100%",
-        //         inView: true,
-        //         transition: this.props.transition,
-        //         zoomedIn: true
-        //     };
-
-        //     let pyramidStyle = Object.assign({}, this.style);
-        //     pyramidStyle = Object.assign(pyramidStyle, {
-        //         zIndex: 1000,
-        //         top: 0,
-        //         height: "100%"
-        //     })
-
-        //     // If the Pyramid is zoomable
-        //     if(this.props.zoomable) {
-        //         elementProps.onClick = this.zoom.bind(this, index);
-        //     }
-
-        //     return (
-        //         <div ref="pyramid" style={pyramidStyle} {...this.classes()}>
-        //             <PyramidElement ref={"element" + index} className={elementClassName} key={index} {...elementProps}>
-        //                 {element}
-        //             </PyramidElement>
-        //         </div>
-        //     )
-        // }
+        let elementWidth = (this.pyramidWidth - (numberOfColumns - 1) * gutter - 2 * padding) / numberOfColumns;
 
         let maxBottom = 0;
 
         // Let's create The Elements of the Pyramid.
         // ("The Elements of the Pyramid"? Lol, sound like a sequel to Luc Besson's "The Fifth Element" ^^)
+
+        // Let's start by doing some necessary checks
         let elements = this.props.children.filter( element => {
             if(!element.props.width || !element.props.height) {
                 switch(element.type) {
@@ -308,35 +399,34 @@ export default class Pyramid extends React.PureComponent {
                     case "object":
                     case "iframe":
                         throw new Error("The original width and height of a media element (img, video, audio, object, iframe) should be supplied. This is because Pyramid needs to calculate the aspect ratio before the media has loaded. Otherwise Pyramid needs to measure the element once the resource has loaded = not optimal. Tough love <3");
-                        return false;
 
                     default:
-                        // WIP
                         return true;
-                        throw new Error("Element type  '" + element.type + "' is not supported. Pyramid, currently only supports img, video and iframe. But don't worry, it will fully support all kinds of elements soon! (the nut is tougher too crack than meets the eye)");
-                        return false;
                 }
             } else {
                 return true;
             }
-        }).map( (element, index, elements) => {
+        });
+
+        let elementsToRender = [];
+
+        for (var index = 0; index < elements.length; index++) {
+            let element = elements[index];
+
             // Declare the height of the element.
             let elementHeight;
 
             // If the dimensions of the element have been measured
             if(this.state.measurements[index]) {
-                // get measurments
-                let measuredWidth = this.state.measurements[index].width;
-                let measuredHeight = this.state.measurements[index].height;
-
                 // use measurements to determine height
-                elementHeight = (elementWidth / measuredWidth) * measuredHeight;
-
-                // just use measuredHeight directly???
-                // console.log("same same?", elementHeight === measuredHeight);
-            } else {
-                // otherwise, calculate height using the dimensions in props
-                // which MUST exist in this scope. The logic holds, trust me.
+                elementHeight = this.state.measurements[index].height;
+            } 
+            // If height prop has not been set
+            else if(!element.props.height) {
+                elementHeight = "auto";
+            } 
+            // otherwise, use the height in props
+            else {
                 elementHeight = (elementWidth / element.props.width) * element.props.height;
             }
 
@@ -348,139 +438,139 @@ export default class Pyramid extends React.PureComponent {
                 elementProps.onClick = this.zoom.bind(this, index);
             }
 
-            if((this.state.zoomedIn || this.state.zoomingIn) && index === this.state.zoomElementIndex) {
+            elementProps = Object.assign(elementProps, {
+                top: padding,
+                left: padding,
+                width: elementWidth,
+                height: elementHeight,
+                inView: this.allElementProps[index] ? this.allElementProps[index].inView : false,
+                transition: this.props.transition,
+                index: index,
+                erd: this.erd,
+                onResize: this.updateMeasurements.bind(this)
+            });
+
+            if(index === this.state.zoomElementIndex) {
+                if(this.state.zoomingOut) {
+                    elementProps.zIndex = 1000;
+                }
+
                 elementProps = Object.assign(elementProps, {
-                    position: "fixed",
-                    top: this.refs.pyramid.scrollTop,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    inView: true,
-                    transition: this.props.transition,
                     zoomedIn: this.state.zoomedIn,
                     zoomingIn: this.state.zoomingIn,
-                    zIndex: 1000
+                    zoomingOut: this.state.zoomingOut
                 });
+            }
 
-                return (
-                    <PyramidElement ref={"element" + index} className={elementClassName} key={index} {...elementProps}>
-                        {element}
-                    </PyramidElement>
-                )
-            } else {
-                elementProps = Object.assign(elementProps, {
-                    top: this.props.padding,
-                    left: this.props.padding,
-                    width: elementWidth,
-                    height: elementHeight,
-                    inView: this.state.allElementProps[index] ? this.state.allElementProps[index].inView : false,
-                    transition: this.props.transition,
-                });
+            // If the element is NOT in the first row
+            if(index >= numberOfColumns) {
+                let elementAbove = this.allElementProps[index - numberOfColumns];
 
-                if(index === this.state.zoomElementIndex) {
-                    if(this.state.zoomingOut) {
-                        elementProps.zIndex = 1000;
-                    }
-
-                    elementProps = Object.assign(elementProps, {
-                        zoomedIn: this.state.zoomedIn,
-                        zoomingIn: this.state.zoomingIn,
-                        zoomingOut: this.state.zoomingOut
-                    });
+                if(elementAbove) {
+                    elementProps.top = elementAbove.top + elementAbove.height + gutter;
                 }
+            } 
 
-                // If the element is NOT in the first row
-                if(index >= numberOfColumns) {
-                    let elementAbove = this.state.allElementProps[index - numberOfColumns];
+            // If the element is NOT the first element in a row
+            if(index % numberOfColumns > 0) {
+                let elementToTheLeft = this.allElementProps[index - 1];
 
-                    if(elementAbove) {
-                        elementProps.top = elementAbove.top + elementAbove.height + this.props.gutter;
-                    }
-                } 
-
-                // If the element is NOT the first element in a row
-                if(index % numberOfColumns > 0) {
-                    let elementToTheLeft = this.state.allElementProps[index - 1];
-
-                    if(elementToTheLeft) {
-                        elementProps.left = elementToTheLeft.left + elementToTheLeft.width + this.props.gutter;
-                    }
-                }
-
-                // If the element is in view (or close to using magic value).
-                // One could say this is mathemagic.
-                if(
-                    ( elementProps.top + (magicValue * this.refs.pyramid.offsetHeight) > this.refs.pyramid.scrollTop
-                      &&
-                      elementProps.top < ( this.refs.pyramid.scrollTop + this.refs.pyramid.offsetHeight) + (magicValue * this.refs.pyramid.offsetHeight)
-                    )
-                    ||
-                    ( (elementProps.top + elementProps.height) + (magicValue * this.refs.pyramid.offsetHeight) > this.refs.pyramid.scrollTop
-                      &&
-                      elementProps.top + elementProps.height < (this.refs.pyramid.scrollTop + this.refs.pyramid.offsetHeight) + (magicValue * this.refs.pyramid.offsetHeight)
-                    )
-                ) {
-                    elementProps.inView = true;
-                } else if(this.props.derenderIfNotInViewAnymore) {
-                    elementProps.inView = false;
+                if(elementToTheLeft) {
+                    elementProps.left = elementToTheLeft.left + elementToTheLeft.width + gutter;
                 }
             }
 
-            if(typeof element.type === "function") {
-                elementProps.erd = this.erd;
+            // Check if the element is in view
+            if(this.isInView(elementProps.top, elementProps.height, magicValue)) {
+                elementProps.inView = true;
+            } else if(this.props.derenderIfNotInViewAnymore) {
+                elementProps.inView = false;
             }
 
             // Otherwise, if the Pyramid has the prop 'onElementClick' set,
             // Bind it to the click event of all pyramid elements (note: event is set on the container, not the element)
             // Can be useful if one wants to give all elements the same event.
-            else if(this.props.onElementClick) {
-                elementProps.onClick = this.handleElementClick.bind(this, index);
-            }
+            // if(this.props.onElementClick) {
+            //     elementProps.onClick = this.handleElementClick.bind(this, index);
+            // }
 
             // Save the element properties to an array in state.
             // This saved me a lot of headache. Pun intended.
-            this.state.allElementProps[index] = elementProps;
+            this.allElementProps[index] = Object.assign({}, elementProps);
 
-            maxBottom = Math.max(maxBottom, elementProps.top + elementProps.height);
+            if(elementProps.height !== "auto") {
+                maxBottom = Math.max(maxBottom, elementProps.top + elementProps.height);
+            }
+
+            if((this.state.zoomedIn || this.state.zoomingIn) && index === this.state.zoomElementIndex) {
+                elementProps = Object.assign(elementProps, {
+                    top: this.refs.pyramid.scrollTop,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    transition: this.props.transition,
+                    zoomedIn: this.state.zoomedIn,
+                    zoomingIn: this.state.zoomingIn,
+                    zIndex: 1000
+                });
+            }
 
             // Finally! Let's return our pyramid element. 
-            return (
+            elementsToRender.push(
                 <PyramidElement ref={"element" + index} className={elementClassName} key={index} {...elementProps}>
                     {element}
                 </PyramidElement>
-            )
-        });
+            );
+
+            if(elementProps.height === "auto" && !this.state.measurements[index]) {
+                // let this be the last element to render for now
+                // we need to let it mount so that we can determine its dimensions
+                break;
+            }
+        };
 
         // A lil' bit of hax doesn't hurt anyone
         // This ensures that their is a bottom padding
         // FAQ:
-        // - Q: Why not just padding-bottom: this.props.padding?
+        // - Q: Why not just padding-bottom: padding?
         // - A: Does not work. Absolute positioned elements.
         // - Q: Have you tried margin-bottom on the pyramidElements of the last row?
         // - A: Yepp, didn't work in all browsers
         // - Q: Okay... Have you tried...
-        // - A: SHUT UP! This works, OKAY!?
+        // - A: Shhh! This works, OKAY!? ¯\(°_o)/¯
         let bottomPadding = (
-            <div style={{width:"100%", height:maxBottom + this.props.padding, position: "absolute", display: "block", zIndex: "-1000"}}></div>
+            <div style={{width:"100%", height:maxBottom + padding, position: "absolute", display: "block", zIndex: "-1000"}}></div>
         );
 
         let pyramidStyle = Object.assign({}, this.style);
+
+        if(this.props.scroller === true) {
+            pyramidStyle = Object.assign(pyramidStyle, {
+                height: "100%",
+                overflowY: "auto",
+                MsOverflowStyle: "-ms-autohiding-scrollbar",
+                WebkitOverflowScrolling: "touch"
+            });
+        } else {
+            pyramidStyle = Object.assign(pyramidStyle, {
+                height: maxBottom + padding
+            });
+        }
+
         if(this.state.zoomingIn || this.state.zoomedIn) {
             pyramidStyle = Object.assign(pyramidStyle, {
                 zIndex: 1000,
-                top: 0,
                 height: "100%",
                 overflowY: "hidden"
-            })
+            });
         }
 
         // Now that we have The Elements of the Pyramid™®
         // let us render the Pyramid.
         return (
             <div ref="pyramid" style={pyramidStyle} {...this.classes()}>
-                {elements}
+                {elementsToRender}
                 {bottomPadding}
-                {this.getElementsForMeasurment(elementWidth, elementClassName)}
             </div>
         );
     }
@@ -488,97 +578,20 @@ export default class Pyramid extends React.PureComponent {
     // Measurement methods
     // ---------------------------
 
-    makeMeasurements() {
-        // Iterate through the hidden measurement elements
-        for (var index = 0; index < this.state.measurementsNeeded; index++) {
-            //the ref, same pattern as when made by getElementsForMeasurment()
-            let ref = "measurement" + index;
-            //get the dom element
-            let domElement = ReactDOM.findDOMNode(this.refs[ref]);
-
-            // measure height
-            let height = domElement.clientHeight;
-            let width = domElement.clientWidth;
-
-            //add measurement
-            this.addMeasurement(index, width, height);
-        }
-
-        // set remeasurementsNeeded to false, which also triggers a (needed) render
-        this.setState({
-            remeasurementsNeeded: false
+    updateMeasurements(index, width, height) {
+        let newMeasurements = Object.assign(this.state.measurements, {
+            [index]: {
+                width: width,
+                height: height
+            }
         });
-    }
 
-    addMeasurement(index, width, height) {
-        // add empty measurement object for element,
-        // with index as key
-        if(!this.state.measurements[index]) {
-            this.state.measurements[index] = {};
-        }
-
-        // set width and height props to measurment object
-        this.state.measurements[index].width = width;
-        this.state.measurements[index].height = height;
+        this.setState({
+            measurements: newMeasurements
+        })
 
         // console.log("Measured index:", index);
         // console.log("Measured width:", width);
         // console.log("Measured height:", height);
-        // console.dir(this.state.measurements);
     }
-
-    allMeasurmentsHaveBeenMade() {
-        // Todo: is this really needed?
-        if(typeof this.state.measurementsNeeded === "undefined") {
-            throw new Error("Dont know how many measurments are needed. 'this.state.measurementsNeeded' is undefined.");
-            return false;
-        }
-
-        // if the measurements needed is equal to the number of measurements made
-        if(this.state.measurementsNeeded === Object.keys(this.state.measurements).length) {
-            // console.log('allMeasurmentsHaveBeenMade', true);
-            return true;
-        } else {
-            // console.log('allMeasurmentsHaveBeenMade', false);
-            return false;
-        }
-    }
-
-    getElementsForMeasurment(elementWidth, elementClassName) {
-        // console.log("getElementsForMeasurment");
-
-        this.state.measurementsNeeded = 0;
-        let measurmentElements = [];
-
-        let elementProps = {
-            width: elementWidth,
-            height: "auto" //to let the browser do the measurement for us
-        }
-
-        // Iterate through the elements
-        for (let index = 0; index < this.props.children.length; index++) {
-            // Get the element
-            let element = this.props.children[index];
-
-            // The ref, same pattern as when made by makeMeasurements()
-            let ref = "measurement" + index;
-
-            // Does the element need measurements?
-            if(!element.props.width || !element.props.height) {
-                // Increment measurementsNeeded
-                this.state.measurementsNeeded += 1;
-
-                // Create and push hiddden pyramid element for measurement
-                measurmentElements.push(
-                    <PyramidElement ref={ref} style={{visibility: "hidden", zIndex: -1000}} className={elementClassName} key={index} {...elementProps}>
-                        {element}
-                    </PyramidElement>
-                );
-            }
-        }
-
-        // Finally, return the hidden elments for measurement
-        return measurmentElements;
-    }
-
 }

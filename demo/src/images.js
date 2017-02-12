@@ -78,6 +78,8 @@ export default class Images extends React.Component {
             };
 
             let images = [
+                <p style={{padding:"20px"}} key={30}>Maecenas quis tortor arcu. Vivamus rutrum nunc non neque consectetur quis placerat neque lobortis. Nam vestibulum, arcu sodales feugiat consectetur, nisl orci bibendum elit, eu.</p>,
+
                 <img src={patternSquare} width="1000" height="1000" key={0}/>,
                 <img src={circle} width="1000" height="1000" key={1}/>,
                 <img src={patternPortrait} width="1000" height="1600" key={2}/>,
@@ -109,13 +111,13 @@ export default class Images extends React.Component {
                 <img src={patternSquare} width="1000" height="1000" key={26}/>,
                 <img src={star} width="1000" height="1000" key={27}/>,
                 <img src={patternPortrait} width="1000" height="1600" key={28}/>,
-                <img src={hexagon} width="1000" height="1000" key={28}/>
+                <img src={hexagon} width="1000" height="1000" key={29}/>
             ]
 
             let imagesPyramid;
             if(this.props.zoomedIn){
                 imagesPyramid = (
-                    <Pyramid transition="all 300ms linear" erd={this.erd} zoomable={true} style={pyramidStyle}>
+                    <Pyramid transition="all 200ms cubic-bezier(.63,-0.43,.33,1.41)" erd={this.erd} zoomable={true} style={pyramidStyle}>
                         {images}
                     </Pyramid>
                 );

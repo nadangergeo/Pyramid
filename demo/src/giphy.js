@@ -26,7 +26,7 @@ export default class Giphy extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if(nextProps.zoomingIn) {
-            this.search("trippy");
+            this.search("cats");
         }
     }
 
@@ -37,10 +37,10 @@ export default class Giphy extends React.Component {
     }
 
     componentDidMount() {
-        // if(this.props.zoomedIn) {
-        //     this.search("trippy");
-        //     this.refs.input.focus();
-        // }
+        if(this.props.zoomedIn) {
+            this.search("trippy");
+            this.refs.input.focus();
+        }
     }
 
     handleSearch(event) {
@@ -152,7 +152,7 @@ export default class Giphy extends React.Component {
         let gifPyramid;
         if(this.props.zoomedIn){
             gifPyramid = (
-                <Pyramid erd={this.erd} transition="all 300ms linear" zoomable={true} style={pyramidStyle} derenderIfNotInViewAnymore={true}>
+                <Pyramid erd={this.erd} transition="all 200ms cubic-bezier(.63,-0.43,.33,1.41)" zoomable={true} style={pyramidStyle} derenderIfNotInViewAnymore={true}>
                     {elements}
                 </Pyramid>
             );

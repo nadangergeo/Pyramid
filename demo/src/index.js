@@ -27,9 +27,8 @@ class Demo extends React.Component {
         };
 
         let demos = [
-            <Giphy key="0" width={"100"} height="100" zoomedIn={false} />,
-            <Images key="1" width={"100"} height="100" zoomedIn={false} />
-            // ,<SpongeBob key="2" width={"100"} height="100" zoomedIn={false} />
+            <Giphy key="0" width={"100"} height="100" zoomedIn={true} />,
+            <Images key="1" width={"100"} height="100" zoomedIn={true} />
         ];
 
         let numberOfColumns = {
@@ -37,10 +36,12 @@ class Demo extends React.Component {
         };
 
         return (
-            <Pyramid transition="all 300ms linear" numberOfColumns={numberOfColumns} erd={this.erd} style={pyramidStyle} zoomable={true} onElementClick={ (element, event) => console.log(element, event)}>
+            <Pyramid transition="all 200ms cubic-bezier(.63,-0.43,.33,1.41)" numberOfColumns={numberOfColumns} erd={this.erd} style={pyramidStyle} zoomable={true} onElementClick={ (element, event) => console.log(element, event)}>
                 {demos}
             </Pyramid>
         );
+
+        // return demos[1];
     }
 }
 

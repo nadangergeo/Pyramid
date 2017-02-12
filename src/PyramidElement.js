@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import BEMHelper from "react-bem-helper";
 
 class PyramidElement extends React.PureComponent {
@@ -46,11 +47,13 @@ class PyramidElement extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        this.mediaTypes = ["img", "video", "audio", "object", "iframe"];
+
         this.classes = new BEMHelper(props.className);
+
         this.state = {
-            loaded: this.mediaTypes.indexOf(this.props.children.type) !== -1 ? false : true
+            loaded: this.isMediaType() ? false : true
         };
+
         this.styleNormalizer = {
             margin: 0,
             padding: 0,
@@ -58,8 +61,43 @@ class PyramidElement extends React.PureComponent {
         };
     }
 
+    componentDidMount() {
+        let element = this.refs[this.element.ref];
+
+        if(this.isReactElement()) {
+            element = ReactDOM.findDOMNode(element);
+        }
+
+        if(!this.isMediaType()) {
+            this.props.erd.listenTo((this.props.height === "auto"), element, this.handleResize.bind(this));
+        }
+    }
+
+    handleResize(event) {
+        let element = event;
+        let width = element.clientWidth;
+        let height = element.clientHeight;
+
+        if(!this.props.zoomingIn && !this.props.zoomingOut) {
+            this.props.onResize(this.props.index, width, height);
+        }
+    }
+
+    handleImageLoaded() {
+        this.setState(
+            { loaded : true }
+        )
+    }
+
+    isMediaType() {
+        return ["img", "video", "audio", "object", "iframe"].indexOf(this.props.children.type) !== -1;
+    }
+
+    isReactElement() {
+        return (typeof this.props.children.type === "function");
+    }
+
     render() {
-        let thisComponent = this;
         let element = this.props.children;
 
         let containerStyle = Object.assign({}, this.styleNormalizer);
@@ -91,7 +129,7 @@ class PyramidElement extends React.PureComponent {
         let elementStyle = Object.assign({}, this.styleNormalizer);
         elementStyle = Object.assign(elementStyle, {
             width: "100%",
-            height: this.mediaTypes.indexOf(this.props.children.type) !== -1 && !this.props.zoomedIn && !this.props.zoomingIn && !this.props.zoomingOut ? "100%" : "auto",
+            height: "auto",
             opacity: this.props.inView && this.state.loaded ? 1 : 0,
             transition: "opacity 300ms linear",
             cursor: element.props.onClick ? "pointer" : "inherit",
@@ -106,33 +144,25 @@ class PyramidElement extends React.PureComponent {
         var elementProps = {
             className: this.classes(element.type).className,
             style: elementStyle,
-            onLoad: this.mediaTypes.indexOf(element.type) !== -1 ? this.handleImageLoaded.bind(this) : null,
+            onLoad: this.isMediaType() ? this.handleImageLoaded.bind(this) : null,
             width: null, //nullify because it is not needed anymore
-            height: null, //nullify because it is not needed anymore 
+            height: null, //nullify because it is not needed anymore
+            ref: element.ref ? element.ref : "element"
         }
 
-        // if(element.props.src && element.props.src.slice(-3) === "gif") {
-        // }
-
-        if(typeof element.type === "function") {
+        if(this.isReactElement()) {
             elementProps.zoomedIn = this.props.zoomedIn;
             elementProps.zoomingIn = this.props.zoomingIn;
             elementProps.zoomingOut = this.props.zoomingOut;
         }
 
-        element = React.cloneElement(element, elementProps);
+        this.element = React.cloneElement(element, elementProps);
 
         return(
             <div style={containerStyle} {...this.classes()} onClick={this.props.onClick}>
-                {this.props.inView ? element : ""}
+                {this.props.inView || !this.isMediaType() ? this.element : ""}
             </div>
         );
-    }
-
-    handleImageLoaded() {
-        this.setState(
-            { loaded : true }
-        )
     }
 }
 
