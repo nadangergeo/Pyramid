@@ -46,7 +46,7 @@ export default class Images extends React.Component {
                 alignItems: "center",
                 justifyContent: "center",
                 opacity: 1,
-                transition: "all 300ms linear"
+                transition: "all 200ms linear"
             };
 
             let headerStyle = {
@@ -56,7 +56,7 @@ export default class Images extends React.Component {
                 letterSpacing: "-0.05em"
             }
 
-            if(this.props.zoomedIn) {
+            if(this.props.zoomingIn || this.props.zoomedIn) {
                 coverStyle.opacity = 0;
             }
 
@@ -66,6 +66,7 @@ export default class Images extends React.Component {
 
             const wrapperStyle = {
                 position: "relative",
+                width: "100%",
                 height: "100%",
                 overflow: "hidden",
                 backgroundColor: "#ccc",
@@ -73,49 +74,48 @@ export default class Images extends React.Component {
 
             const pyramidStyle = {
                 height: "100%",
-                backgroundColor: "#ccc",
-                transition: "all 300ms linear"
+                backgroundColor: "#ccc"
             };
 
             let images = [
-                <p style={{padding:"20px"}} key={30}>Maecenas quis tortor arcu. Vivamus rutrum nunc non neque consectetur quis placerat neque lobortis. Nam vestibulum, arcu sodales feugiat consectetur, nisl orci bibendum elit, eu.</p>,
+                <p style={{padding:"20px", backgroundColor: "black", color: "white"}} key={30}>Maecenas quis tortor arcu. Vivamus rutrum nunc non neque consectetur quis placerat neque lobortis. Nam vestibulum, arcu sodales feugiat consectetur, nisl orci bibendum elit, eu.</p>,
 
-                <img src={patternSquare} width="1000" height="1000" key={0}/>,
-                <img src={circle} width="1000" height="1000" key={1}/>,
-                <img src={patternPortrait} width="1000" height="1600" key={2}/>,
-                <img src={triangle} width="1000" height="1000" key={3}/>,
-                <img src={patternLandscape} width="1600" height="1000" key={4}/>,
-                <img src={square} width="1000" height="1000" key={5}/>,
-                <img src={patternSquare} width="1000" height="1000" key={6}/>,
-                <img src={star} width="1000" height="1000" key={7}/>,
-                <img src={patternPortrait} width="1000" height="1600" key={8}/>,
-                <img src={hexagon} width="1000" height="1000" key={9}/>,
+                <img center src={patternSquare} width="1000" height="1000" key={0}/>,
+                <img center src={circle} width="1000" height="1000" key={1}/>,
+                <img center src={patternPortrait} width="1000" height="1600" key={2}/>,
+                <img center src={triangle} width="1000" height="1000" key={3}/>,
+                <img center src={patternLandscape} width="1600" height="1000" key={4}/>,
+                <img center src={square} width="1000" height="1000" key={5}/>,
+                <img center src={patternSquare} width="1000" height="1000" key={6}/>,
+                <img center src={star} width="1000" height="1000" key={7}/>,
+                <img center src={patternPortrait} width="1000" height="1600" key={8}/>,
+                <img center src={hexagon} width="1000" height="1000" key={9}/>,
                 // repeat
-                <img src={patternSquare} width="1000" height="1000" key={10}/>,
-                <img src={circle} width="1000" height="1000" key={11}/>,
-                <img src={patternPortrait} width="1000" height="1600" key={12}/>,
-                <img src={triangle} width="1000" height="1000" key={13}/>,
-                <img src={patternLandscape} width="1600" height="1000" key={14}/>,
-                <img src={square} width="1000" height="1000" key={15}/>,
-                <img src={patternSquare} width="1000" height="1000" key={16}/>,
-                <img src={star} width="1000" height="1000" key={17}/>,
-                <img src={patternPortrait} width="1000" height="1600" key={18}/>,
-                <img src={hexagon} width="1000" height="1000" key={19}/>,
+                <img center src={patternSquare} width="1000" height="1000" key={10}/>,
+                <img center src={circle} width="1000" height="1000" key={11}/>,
+                <img center src={patternPortrait} width="1000" height="1600" key={12}/>,
+                <img center src={triangle} width="1000" height="1000" key={13}/>,
+                <img center src={patternLandscape} width="1600" height="1000" key={14}/>,
+                <img center src={square} width="1000" height="1000" key={15}/>,
+                <img center src={patternSquare} width="1000" height="1000" key={16}/>,
+                <img center src={star} width="1000" height="1000" key={17}/>,
+                <img center src={patternPortrait} width="1000" height="1600" key={18}/>,
+                <img center src={hexagon} width="1000" height="1000" key={19}/>,
                 // repeat
-                <img src={patternSquare} width="1000" height="1000" key={20}/>,
-                <img src={circle} width="1000" height="1000" key={21}/>,
-                <img src={patternPortrait} width="1000" height="1600" key={22}/>,
-                <img src={triangle} width="1000" height="1000" key={23}/>,
-                <img src={patternLandscape} width="1600" height="1000" key={24}/>,
-                <img src={square} width="1000" height="1000" key={25}/>,
-                <img src={patternSquare} width="1000" height="1000" key={26}/>,
-                <img src={star} width="1000" height="1000" key={27}/>,
-                <img src={patternPortrait} width="1000" height="1600" key={28}/>,
-                <img src={hexagon} width="1000" height="1000" key={29}/>
+                <img center src={patternSquare} width="1000" height="1000" key={20}/>,
+                <img center src={circle} width="1000" height="1000" key={21}/>,
+                <img center src={patternPortrait} width="1000" height="1600" key={22}/>,
+                <img center src={triangle} width="1000" height="1000" key={23}/>,
+                <img center src={patternLandscape} width="1600" height="1000" key={24}/>,
+                <img center src={square} width="1000" height="1000" key={25}/>,
+                <img center src={patternSquare} width="1000" height="1000" key={26}/>,
+                <img center src={star} width="1000" height="1000" key={27}/>,
+                <img center src={patternPortrait} width="1000" height="1600" key={28}/>,
+                <img center src={hexagon} width="1000" height="1000" key={29}/>
             ]
 
             let imagesPyramid;
-            if(this.props.zoomedIn){
+            if(this.props.zoomedIn || this.props.zoomingIn || this.props.zoomingOut){
                 imagesPyramid = (
                     <Pyramid transition="all 200ms cubic-bezier(.63,-0.43,.33,1.41)" erd={this.erd} zoomable={true} style={pyramidStyle}>
                         {images}

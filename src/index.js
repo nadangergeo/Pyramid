@@ -4,7 +4,6 @@ import BEMHelper from "react-bem-helper";
 import getUnit from "get-unit";
 import elementResizeDetector from "element-resize-detector";
 import throttle from "lodash.throttle";
-import transitionUtility from "transition-utility";
 
 import PyramidElement from "./PyramidElement";
 
@@ -18,7 +17,6 @@ export default class Pyramid extends React.PureComponent {
         transition: React.PropTypes.string,
         derenderIfNotInViewAnymore: React.PropTypes.bool,
         style: React.PropTypes.object,
-        onElementClick: React.PropTypes.func,
         zoomable: React.PropTypes.bool,
         scroller: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.object])
     };
@@ -75,7 +73,6 @@ export default class Pyramid extends React.PureComponent {
             zoomedIn: false,
             zoomingIn: false,
             zoomingOut: false,
-            zoomElementIndex: null,
             measurements: {}
         }
     }
@@ -98,21 +95,6 @@ export default class Pyramid extends React.PureComponent {
         // Remove all event listeners
         this.erd.removeAllListeners(this.refs.pyramid);
         this.getScroller().removeEventListener('scroll', this.throttledScrollEventFunction, true);
-    }
-
-    // WIP
-    componentDidUpdate() {
-        // console.log("componentDidUpdate");
-
-        if(this.state.zoomingIn) {
-            ReactDOM.findDOMNode(this.refs["element" + this.state.zoomElementIndex]).addEventListener(transitionUtility.getEndEvent(), this.zoomInEnd.bind(this));
-        } else if(this.state.zoomingOut) {
-            ReactDOM.findDOMNode(this.refs["element" + this.state.zoomElementIndex]).addEventListener(transitionUtility.getEndEvent(), this.zoomOutEnd.bind(this));
-        }
-
-        // console.log("zoomedIn", this.state.zoomedIn);
-        // console.log("zoomingIn", this.state.zoomingIn);
-        // console.log("zoomingOut", this.state.zoomingOut);
     }
 
     getScroller() {
@@ -143,10 +125,8 @@ export default class Pyramid extends React.PureComponent {
         } 
     }
 
-    handleElementClick(index, event) {
-        if(this.props.onElementClick) {
-            this.props.onElementClick(this.allElementProps[index], event);
-        }
+    getScrollTop(scroller = this.getScroller()){
+        return scroller === window ? scroller.pageYOffset : scroller.scrollTop;
     }
 
     handleResize(event) {
@@ -165,7 +145,7 @@ export default class Pyramid extends React.PureComponent {
         let magic = (magicValue * this.refs.pyramid.offsetHeight);
         let scrollerHeight = scroller.offsetHeight || scroller.innerHeight;
         let offsetTop = this.props.scroller ? 0 : this.refs.pyramid.offsetTop;
-        let scrollTop = scroller === window ? scroller.pageYOffset : scroller.scrollTop;
+        let scrollTop = this.getScrollTop();
 
         if(
             ( top + magic > scrollTop - offsetTop
@@ -184,50 +164,60 @@ export default class Pyramid extends React.PureComponent {
         }
     }
 
-    zoom(index, event) {
-        event.stopPropagation();
+    willZoomIn() {
+            console.log("willZoomIn!");
 
-        console.log("ZOOM!", index);
+            if(typeof this.props.onWillZoomIn === "function") {
+                this.props.onWillZoomIn();
+            }
 
-        if(!this.state.zoomedIn) {
-            this.setState({
-                zoomingIn: true,
-                zoomingOut: false,
-                zoomElementIndex: index
-            });
-        } else {
             this.setState({
                 zoomedIn: false,
-                zoomingOut: true
+                zoomingIn: true,
+                zoomingOut: false
             });
-        }
     }
 
-    zoomInEnd(event) {
-        if (event.propertyName === "width") {
-            console.log("zoomInEnd!");
+    willZoomOut() {
+            console.log("willZoomOut!");
+
+            if(typeof this.props.onWillZoomOut === "function") {
+                this.props.onWillZoomOut();
+            }
 
             this.setState({
                 zoomedIn: true,
                 zoomingIn: false,
                 zoomingOut: false
             });
-        }
     }
 
-    zoomOutEnd(event) {
-        if (event.propertyName === "width") {
-            console.log("zoomOutEnd!");
+    didZoomIn() {
+            console.log("didZoomIn!");
+
+            if(typeof this.props.onDidZoomIn === "function") {
+                this.props.onDidZoomIn();
+            }
+
+            this.setState({
+                zoomedIn: true,
+                zoomingIn: false,
+                zoomingOut: false
+            });
+    }
+
+    didZoomOut() {
+            console.log("didZoomOut!");
+
+            if(typeof this.props.onDidZoomOut === "function") {
+                this.props.onDidZoomOut();
+            }
 
             this.setState({
                 zoomedIn: false,
                 zoomingIn: false,
                 zoomingOut: false
             });
-
-            ReactDOM.findDOMNode(this.refs["element" + this.state.zoomElementIndex]).removeEventListener(transitionUtility.getEndEvent(), this.zoomOutEnd.bind(this));
-            ReactDOM.findDOMNode(this.refs["element" + this.state.zoomElementIndex]).removeEventListener(transitionUtility.getEndEvent(), this.zoomInEnd.bind(this));
-        }
     }
 
     reRender() {
@@ -416,27 +406,23 @@ export default class Pyramid extends React.PureComponent {
             // Declare the height of the element.
             let elementHeight;
 
+            // If available, use the height in props, to calculate height
+            if(element.props.height) {
+                elementHeight = (elementWidth / element.props.width) * element.props.height;
+            }
             // If the dimensions of the element have been measured
-            if(this.state.measurements[index]) {
+            else if(this.state.measurements[index]) {
                 // use measurements to determine height
                 elementHeight = this.state.measurements[index].height;
             } 
-            // If height prop has not been set
-            else if(!element.props.height) {
+            // Uknown height
+            else {
                 elementHeight = "auto";
             } 
-            // otherwise, use the height in props
-            else {
-                elementHeight = (elementWidth / element.props.width) * element.props.height;
-            }
+            
 
             // Let's set the inital props using what we know thus far.
             let elementProps = {};
-
-            // If the Pyramid is zoomable
-            if(this.props.zoomable) {
-                elementProps.onClick = this.zoom.bind(this, index);
-            }
 
             elementProps = Object.assign(elementProps, {
                 top: padding,
@@ -447,18 +433,17 @@ export default class Pyramid extends React.PureComponent {
                 transition: this.props.transition,
                 index: index,
                 erd: this.erd,
-                onResize: this.updateMeasurements.bind(this)
+                onResize: this.updateMeasurements.bind(this),
+                pyramidScrollTop: this.getScrollTop(),
+                zoomable: this.props.zoomable && (this.props.zoomedIn || typeof this.props.zoomedIn === "undefined")
             });
 
-            if(index === this.state.zoomElementIndex) {
-                if(this.state.zoomingOut) {
-                    elementProps.zIndex = 1000;
-                }
-
+            if(this.props.zoomable) {
                 elementProps = Object.assign(elementProps, {
-                    zoomedIn: this.state.zoomedIn,
-                    zoomingIn: this.state.zoomingIn,
-                    zoomingOut: this.state.zoomingOut
+                    onWillZoomIn: this.willZoomIn.bind(this),
+                    onWillZoomOut: this.willZoomOut.bind(this),
+                    onDidZoomIn: this.didZoomIn.bind(this),
+                    onDidZoomOut: this.didZoomOut.bind(this),
                 });
             }
 
@@ -487,32 +472,12 @@ export default class Pyramid extends React.PureComponent {
                 elementProps.inView = false;
             }
 
-            // Otherwise, if the Pyramid has the prop 'onElementClick' set,
-            // Bind it to the click event of all pyramid elements (note: event is set on the container, not the element)
-            // Can be useful if one wants to give all elements the same event.
-            // if(this.props.onElementClick) {
-            //     elementProps.onClick = this.handleElementClick.bind(this, index);
-            // }
-
             // Save the element properties to an array in state.
             // This saved me a lot of headache. Pun intended.
             this.allElementProps[index] = Object.assign({}, elementProps);
 
             if(elementProps.height !== "auto") {
                 maxBottom = Math.max(maxBottom, elementProps.top + elementProps.height);
-            }
-
-            if((this.state.zoomedIn || this.state.zoomingIn) && index === this.state.zoomElementIndex) {
-                elementProps = Object.assign(elementProps, {
-                    top: this.refs.pyramid.scrollTop,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    transition: this.props.transition,
-                    zoomedIn: this.state.zoomedIn,
-                    zoomingIn: this.state.zoomingIn,
-                    zIndex: 1000
-                });
             }
 
             // Finally! Let's return our pyramid element. 

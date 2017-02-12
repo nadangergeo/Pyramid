@@ -96,7 +96,7 @@ export default class Giphy extends React.Component {
             left: 0,
             bottom: 0,
             right: 0,
-            zIndex: 500,
+            zIndex: 1000,
             display: "flex",
             height: "100%",
             overflow: "hidden",
@@ -105,7 +105,7 @@ export default class Giphy extends React.Component {
             alignItems: "center",
             justifyContent: "center",
             opacity: 1,
-            transition: "all 300ms linear"
+            transition: "all 200ms linear"
         };
 
         let headerStyle = {
@@ -115,7 +115,7 @@ export default class Giphy extends React.Component {
             letterSpacing: "-0.05em"
         }
 
-        if(this.props.zoomedIn) {
+        if(this.props.zoomingIn || this.props.zoomedIn) {
             coverStyle.opacity = 0;
         }
 
@@ -125,6 +125,7 @@ export default class Giphy extends React.Component {
 
         let wrapperStyle = {
             position: "relative",
+            width: "100%",
             height: "100%",
             overflow: "hidden",
             backgroundColor: "#ccc",
@@ -132,13 +133,12 @@ export default class Giphy extends React.Component {
 
         let pyramidStyle = {
             height: "calc(100% - 120px)",
-            top: "120px",
-            transition: "all 300ms linear"
+            top: "120px"
         };
 
         let inputContainerStyle = {
             opacity: 0,
-            transition: "all 300ms linear"
+            transition: "all 200ms linear"
         };
 
         if(this.props.zoomedIn) {
@@ -146,11 +146,11 @@ export default class Giphy extends React.Component {
         }
 
         let elements = this.state.gifs.map( (gif, index) => {
-            return <img key={index} src={gif.src} width={gif.width} height={gif.height}/>;
+            return <img center key={index} src={gif.src} width={gif.width} height={gif.height}/>;
         });
 
         let gifPyramid;
-        if(this.props.zoomedIn){
+        if(this.props.zoomedIn || this.props.zoomingIn || this.props.zoomingOut){
             gifPyramid = (
                 <Pyramid erd={this.erd} transition="all 200ms cubic-bezier(.63,-0.43,.33,1.41)" zoomable={true} style={pyramidStyle} derenderIfNotInViewAnymore={true}>
                     {elements}
