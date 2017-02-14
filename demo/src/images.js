@@ -39,13 +39,8 @@ export default class Images extends React.Component {
                 coverStyle.zIndex = -1000;
             }
 
-            let pyramidStyle = {
-                height: "100%",
-                backgroundColor: "#ccc"
-            };
-
             let images = [
-                <p style={{padding:"20px", backgroundColor: "black", color: "white"}} key={30}>Maecenas quis tortor arcu. Vivamus rutrum nunc non neque consectetur quis placerat neque lobortis. Nam vestibulum, arcu sodales feugiat consectetur, nisl orci bibendum elit, eu.</p>,
+                // <p style={{padding:"20px", backgroundColor: "black", color: "white"}} key={30}>Maecenas quis tortor arcu. Vivamus rutrum nunc non neque consectetur quis placerat neque lobortis. Nam vestibulum, arcu sodales feugiat consectetur, nisl orci bibendum elit, eu.</p>,
 
                 <img center src={patternSquare} width="1000" height="1000" key={0}/>,
                 <img center src={circle} width="1000" height="1000" key={1}/>,
@@ -82,9 +77,9 @@ export default class Images extends React.Component {
             ]
 
             let imagesPyramid;
-            if(this.props.zoomedIn || this.props.zoomingIn || this.props.zoomingOut){
+            if(this.props.zoomedIn || this.props.zoomingOut){
                 imagesPyramid = (
-                    <Pyramid transition="all 200ms cubic-bezier(.63,-0.43,.33,1.41)" erd={this.erd} zoomable={true} style={pyramidStyle}>
+                    <Pyramid erd={this.erd} zoomable={true}>
                         {images}
                     </Pyramid>
                 );

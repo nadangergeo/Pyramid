@@ -119,20 +119,18 @@ export default class Giphy extends React.Component {
 
         let inputContainerStyle = {
             top: this.state.hideSearch ? "-120px" : "0px",
-            opacity: this.props.zoomedIn ? 1 : 0
         };
 
         let elements = this.state.gifs.map( (gif, index) => {
-            return <img center key={index} src={gif.src} width={gif.width} height={gif.height}/>;
+            return <img center key={gif.src} src={gif.src} width={gif.width} height={gif.height}/>;
         });
 
         let gifPyramid;
-        if(this.props.zoomedIn || this.props.zoomingIn || this.props.zoomingOut){
+        if(this.props.zoomedIn || this.props.zoomingOut){
             let props = {
                 erd: this.erd,
                 onWillZoomIn: this.handlePyramidWillZoomIn.bind(this),
                 onWillZoomOut: this.handlePyramidWillZoomOut.bind(this),
-                transition: "all 200ms cubic-bezier(.63,-0.43,.33,1.41)",
                 zoomable: true,
                 style: pyramidStyle,
                 derenderIfNotInViewAnymore: true

@@ -36,7 +36,7 @@ class Demo extends React.Component {
         };
 
         return (
-            <Pyramid transition="all 200ms cubic-bezier(.63,-0.43,.33,1.41)" numberOfColumns={numberOfColumns} erd={this.erd} style={pyramidStyle} zoomable={true} onElementClick={ (element, event) => console.log(element, event)}>
+            <Pyramid numberOfColumns={numberOfColumns} erd={this.erd} style={pyramidStyle} zoomable={true} onElementClick={ (element, event) => console.log(element, event)}>
                 {demos}
             </Pyramid>
         );

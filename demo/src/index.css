@@ -10,11 +10,15 @@ html, body, #demo {
 }
 
 body {
-    /*background-color: #bac0b2;*/
     background-color: #ccc;
 }
 
 .pyramid {
+    transition: all 200ms cubic-bezier(.63,-0.43,.33,1.41);
+}
+
+.pyramid__element--zoomingIn,
+.pyramid__element--zoomingOut {
     transition: all 200ms cubic-bezier(.63,-0.43,.33,1.41);
 }
 

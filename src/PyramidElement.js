@@ -18,7 +18,7 @@ class PyramidElement extends React.PureComponent {
         left: React.PropTypes.number,
         style: React.PropTypes.object,
         className: React.PropTypes.string,
-        transition: React.PropTypes.string,
+        zoomTransition: React.PropTypes.string,
         inView: React.PropTypes.bool,
         erd: React.PropTypes.object,
         zoomable: React.PropTypes.bool,
@@ -34,7 +34,6 @@ class PyramidElement extends React.PureComponent {
         top: 0,
         left: 0,
         className: "element",
-        transition: "none",
         inView: true,
         zoomable: false,
         zoomedIn: false,
@@ -85,6 +84,15 @@ class PyramidElement extends React.PureComponent {
         this.refs.elementContainer.removeEventListener(transitionUtility.getEndEvent(), this.transitionEndEventFunction, false);
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if(this.state.zoomingIn || this.state.zoomingOut) {
+            if(!this.hasZoomTransition()) {
+                console.log("no transiton, faking transition end event");
+                this.handleTransitionEnd();
+            }
+        }
+    }
+
     getElementDOMNode() {
         let element = this.refs[this.element.ref];
 
@@ -106,13 +114,20 @@ class PyramidElement extends React.PureComponent {
     }
 
     handleTransitionEnd(event) {
-        if (event.propertyName === "width") {
+        if (typeof event === "undefined" || event.propertyName === "width") {
             if(this.state.zoomingIn) {
                 this.didZoomIn(event);
             } else if(this.state.zoomingOut) {
                 this.didZoomOut(event);
             }
         }
+    }
+
+    hasZoomTransition() {
+        let style = this.refs.elementContainer.style;
+        let computedStyle = window.getComputedStyle(this.refs.elementContainer);
+
+        return parseFloat(style.transitionDuration) > 0 || parseFloat(computedStyle.transitionDuration) > 0;
     }
 
     handleImageLoaded() {
@@ -139,7 +154,7 @@ class PyramidElement extends React.PureComponent {
         this.setState({
             zoomedIn: false,
             zoomingIn: true,
-            zoomingOut: false,
+            zoomingOut: false
         });
     }
 
@@ -153,7 +168,7 @@ class PyramidElement extends React.PureComponent {
         this.setState({
             zoomedIn: false,
             zoomingIn: false,
-            zoomingOut: true,
+            zoomingOut: true
         });
     }
 
@@ -165,7 +180,7 @@ class PyramidElement extends React.PureComponent {
         this.setState({
             zoomedIn: true,
             zoomingIn: false,
-            zoomingOut: false,
+            zoomingOut: false
         });
     }
 
@@ -177,7 +192,7 @@ class PyramidElement extends React.PureComponent {
         this.setState({
             zoomedIn: false,
             zoomingIn: false,
-            zoomingOut: false,
+            zoomingOut: false
         });
 
         if(!this.isMediaType()) {
@@ -201,7 +216,6 @@ class PyramidElement extends React.PureComponent {
             top: this.props.top,
             left: this.props.left,
             zIndex: this.state.zoomedIn || this.state.zoomingIn || this.state.zoomingOut ? 1000 : "auto",
-            transition: this.state.zoomingIn || this.state.zoomingOut ? this.props.transition : "none",
             cursor: this.props.zoomable ? "pointer" : "default"
         });
 
@@ -230,6 +244,12 @@ class PyramidElement extends React.PureComponent {
             });
         }
 
+        if(this.state.zoomingIn || this.state.zoomingOut) {
+            containerStyle = Object.assign(containerStyle, {
+                transition: this.props.zoomTransition ? this.props.zoomTransition : null
+            });
+        }
+
         let containerClassesOptions = {
             modifiers: {
                 "zoomedIn": this.state.zoomedIn,
@@ -255,8 +275,8 @@ class PyramidElement extends React.PureComponent {
             opacity: this.props.inView && this.state.loaded ? 1 : 0,
             transition: "opacity 300ms linear",
             boxSizing: "border-box",
-            WebkitTransform: "translateZ(0)", //GPU-acceleration, does it help?
-            transform: "translateZ(0)"
+            // WebkitTransform: "translateZ(0)", //GPU-acceleration, does it help?
+            // transform: "translateZ(0)"
         });
 
         if(element.props.style) {
