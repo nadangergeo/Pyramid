@@ -68,7 +68,6 @@ class PyramidElement extends React.PureComponent {
         let element = this.getElementDOMNode();
 
         if(!this.isMediaType()) {
-            console.log("listening to resize");
             this.erd.listenTo((this.props.height === "auto"), element, this.handleResize.bind(this));
         }
 
@@ -231,9 +230,18 @@ class PyramidElement extends React.PureComponent {
             });
         }
 
+        let containerClassesOptions = {
+            modifiers: {
+                "zoomedIn": this.state.zoomedIn,
+                "zoomedOut": !this.state.zoomedIn,
+                "zoomingIn": this.state.zoomingIn,
+                "zoomingOut": this.state.zoomingOut
+            }
+        };
+
         let containerProps = {
             style: containerStyle,
-            className: this.classes().className,
+            className: this.classes(containerClassesOptions).className,
             onClick: this.props.zoomable ? this.state.zoomedIn ? this.zoomOut.bind(this) : this.zoomIn.bind(this) : null
         }
 
@@ -255,8 +263,7 @@ class PyramidElement extends React.PureComponent {
             elementStyle = Object.assign(elementStyle, element.props.style);
         }
 
-        var elementProps = {
-            className: this.classes(element.type).className,
+        let elementProps = {
             style: elementStyle,
             onLoad: this.isMediaType() ? this.handleImageLoaded.bind(this) : null,
             width: null, //nullify because it is not needed anymore

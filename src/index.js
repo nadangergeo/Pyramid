@@ -219,6 +219,19 @@ export default class Pyramid extends React.PureComponent {
             });
     }
 
+    updateMeasurements(index, width, height) {
+        let newMeasurements = Object.assign(this.state.measurements, {
+            [index]: {
+                width: width,
+                height: height
+            }
+        });
+
+        this.setState({
+            measurements: newMeasurements
+        })
+    }
+
     reRender() {
         // console.log("RERENDER!!!");
         if(this.mounted) {
@@ -499,7 +512,7 @@ export default class Pyramid extends React.PureComponent {
         };
 
         // A lil' bit of hax doesn't hurt anyone
-        // This ensures that their is a bottom padding
+        // This ensures that there is a bottom padding
         // FAQ:
         // - Q: Why not just padding-bottom: padding?
         // - A: Does not work. Absolute positioned elements.
@@ -531,33 +544,22 @@ export default class Pyramid extends React.PureComponent {
             });
         }
 
+        let pyramidClassesOptions = {
+            modifiers: {
+                "zoomedIn": this.state.zoomedIn,
+                "zoomedOut": !this.state.zoomedIn,
+                "zoomingIn": this.state.zoomingIn,
+                "zoomingOut": this.state.zoomingOut
+            }
+        };
+
         // Now that we have The Elements of the Pyramid™®
         // let us render the Pyramid.
         return (
-            <div ref="pyramid" style={pyramidStyle} {...this.classes()}>
+            <div ref="pyramid" style={pyramidStyle} {...this.classes(pyramidClassesOptions)}>
                 {elementsToRender}
                 {bottomPadding}
             </div>
         );
-    }
-
-    // Measurement methods
-    // ---------------------------
-
-    updateMeasurements(index, width, height) {
-        let newMeasurements = Object.assign(this.state.measurements, {
-            [index]: {
-                width: width,
-                height: height
-            }
-        });
-
-        this.setState({
-            measurements: newMeasurements
-        })
-
-        // console.log("Measured index:", index);
-        // console.log("Measured width:", width);
-        // console.log("Measured height:", height);
     }
 }
