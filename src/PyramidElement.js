@@ -34,10 +34,7 @@ class PyramidElement extends React.PureComponent {
         left: 0,
         className: "element",
         inView: true,
-        zoomable: false,
-        zoomedIn: false,
-        zoomingIn: false,
-        zoomingOut: false
+        zoomable: false
     };
 
     constructor(props) {
