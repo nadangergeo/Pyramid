@@ -16,7 +16,6 @@ class PyramidElement extends React.PureComponent {
                 ]).isRequired,
         top: React.PropTypes.number,
         left: React.PropTypes.number,
-        style: React.PropTypes.object,
         className: React.PropTypes.string,
         zoomTransition: React.PropTypes.string,
         inView: React.PropTypes.bool,
@@ -225,10 +224,6 @@ class PyramidElement extends React.PureComponent {
                 alignItems: "center",
                 justifyContent: "center"
             });
-        }
-
-        if(this.props.style) {
-            containerStyle = Object.assign(containerStyle, this.props.style);
         }
 
         if(this.state.zoomedIn || this.state.zoomingIn) {
