@@ -9,11 +9,11 @@ import PyramidElement from "./PyramidElement";
 
 export default class Pyramid extends React.PureComponent {
     static propTypes = { 
-        numberOfColumns: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.object]),
-        magicValue: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.object]),
+        numberOfColumns: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string, React.PropTypes.object]),
+        magicValue: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string, React.PropTypes.object]),
         className: React.PropTypes.string,
-        gutter: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.object]),
-        padding: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.object]),
+        gutter: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string, React.PropTypes.object]),
+        padding: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string, React.PropTypes.object]),
         zoomTransition: React.PropTypes.string,
         derenderIfNotInViewAnymore: React.PropTypes.bool,
         style: React.PropTypes.object,
@@ -231,6 +231,40 @@ export default class Pyramid extends React.PureComponent {
         })
     }
 
+    getResponsivePropValue(prop) {
+        let value;
+
+        if(typeof this.props[prop] === "number") {
+            value = this.props[prop];
+        } else if(typeof this.props[prop] === "string") {
+            value = parseInt(this.props[prop]);
+        } else {
+            // Let the value be intially defined as the default value.
+            value = this.props[prop].default;
+            // Then let us iterate through all the breakpoints.
+            for(let key in this.props[prop].breakpoints) {
+                if (this.props[prop].breakpoints.hasOwnProperty(key)) {
+                    // What unit was the breakpoint defined with?
+                    let unit = getUnit(key);
+
+                    // Pyramid only supports pixels atm.
+                    // Todo: support ems and % ?
+                    if(unit !== "px") {
+                        throw new Error("Pyramid does not support the unit '" + unit + "' for breakpoints in the property " + prop + ". You could always help out to implement it and make a pull request ^^ Cheers!");
+                    }
+
+                    // If the width of the Pyramid is greater or equal to the breakpoint, then...
+                    if(this.pyramidWidth >= parseInt(key, 10)) {
+                        // set the magic value to the number corresponding to the breakpoint
+                        value = this.props[prop].breakpoints[key];
+                    }
+                }
+            }
+        }
+
+        return value;
+    }
+
     reRender() {
         // console.log("RERENDER!!!");
         if(this.mounted) {
@@ -271,117 +305,11 @@ export default class Pyramid extends React.PureComponent {
             )
         }
 
-        // Let's figure out how many columns the Pyramid should have.
-        let numberOfColumns;
-        if(typeof this.props.numberOfColumns === "number") {
-            numberOfColumns = this.props.numberOfColumns;
-        } else {
-            // Let it first be defined as the default value.
-            numberOfColumns = this.props.numberOfColumns.default;
-            // Then let us iterate through all the breakpoints.
-            for(let key in this.props.numberOfColumns.breakpoints) {
-                if (this.props.numberOfColumns.breakpoints.hasOwnProperty(key)) {
-                    // What unit was the breakpoint defined with?
-                    let unit = getUnit(key);
-
-                    // Pyramid only supports pixels atm.
-                    // Todo: support ems and % ?
-                    if(unit !== "px") {
-                        throw new Error("Pyramid does not support the unit '" + unit + "' for breakpoints in the property numberOfColumns. You could always help out to implement it and make a pull request ^^ Cheers!");
-                    }
-
-                    // If the width of the Pyramid is greater or equal to the breakpoint, then...
-                    if(this.pyramidWidth >= parseInt(key, 10)) {
-                        // set the number of columns to the number corresponding to the breakpoint
-                        numberOfColumns = this.props.numberOfColumns.breakpoints[key];
-                    }
-                }
-            }
-        }
-
-        // Let's determine the magic value.
-        let magicValue;
-        if(typeof this.props.magicValue === "number") {
-            magicValue = this.props.magicValue;
-        } else {
-            // Let the magic value be intially defined as the default value.
-            magicValue = this.props.magicValue.default;
-            // Then let us iterate through all the breakpoints.
-            for(let key in this.props.magicValue.breakpoints) {
-                if (this.props.magicValue.breakpoints.hasOwnProperty(key)) {
-                    // What unit was the breakpoint defined with?
-                    let unit = getUnit(key);
-
-                    // Pyramid only supports pixels atm.
-                    // Todo: support ems and % ?
-                    if(unit !== "px") {
-                        throw new Error("Pyramid does not support the unit '" + unit + "' for breakpoints in the property magicValue. You could always help out to implement it and make a pull request ^^ Cheers!");
-                    }
-
-                    // If the width of the Pyramid is greater or equal to the breakpoint, then...
-                    if(this.pyramidWidth >= parseInt(key, 10)) {
-                        // set the magic value to the number corresponding to the breakpoint
-                        magicValue = this.props.magicValue.breakpoints[key];
-                    }
-                }
-            }
-        }
-
-        // Let's determine the padding.
-        let padding;
-        if(typeof this.props.padding === "number") {
-            padding = this.props.padding;
-        } else {
-            // Let the padding be intially defined as the default value.
-            padding = this.props.padding.default;
-            // Then let us iterate through all the breakpoints.
-            for(let key in this.props.padding.breakpoints) {
-                if (this.props.padding.breakpoints.hasOwnProperty(key)) {
-                    // What unit was the breakpoint defined with?
-                    let unit = getUnit(key);
-
-                    // Pyramid only supports pixels atm.
-                    // Todo: support ems and % ?
-                    if(unit !== "px") {
-                        throw new Error("Pyramid does not support the unit '" + unit + "' for breakpoints in the property padding. You could always help out to implement it and make a pull request ^^ Cheers!");
-                    }
-
-                    // If the width of the Pyramid is greater or equal to the breakpoint, then...
-                    if(this.pyramidWidth >= parseInt(key, 10)) {
-                        // set the magic value to the number corresponding to the breakpoint
-                        padding = this.props.padding.breakpoints[key];
-                    }
-                }
-            }
-        }
-
-        // Let's determine the gutter.
-        let gutter;
-        if(typeof this.props.gutter === "number") {
-            gutter = this.props.gutter;
-        } else {
-            // Let the gutter be intially defined as the default value.
-            gutter = this.props.gutter.default;
-            // Then let us iterate through all the breakpoints.
-            for(let key in this.props.gutter.breakpoints) {
-                if (this.props.gutter.breakpoints.hasOwnProperty(key)) {
-                    // What unit was the breakpoint defined with?
-                    let unit = getUnit(key);
-
-                    // Pyramid only supports pixels atm.
-                    // Todo: support ems and % ?
-                    if(unit !== "px") {
-                        throw new Error("Pyramid does not support the unit '" + unit + "' for breakpoints in the property gutter. You could always help out to implement it and make a pull request ^^ Cheers!");
-                    }
-
-                    // If the width of the Pyramid is greater or equal to the breakpoint, then...
-                    if(this.pyramidWidth >= parseInt(key, 10)) {
-                        // set the magic value to the number corresponding to the breakpoint
-                        gutter = this.props.gutter.breakpoints[key];
-                    }
-                }
-            }
-        }
+        // Get responsive prop values
+        let numberOfColumns = this.getResponsivePropValue("numberOfColumns");
+        let magicValue = this.getResponsivePropValue("magicValue");
+        let padding = this.getResponsivePropValue("padding");
+        let gutter = this.getResponsivePropValue("gutter");
 
         // Define class for elements using BEMHelper (defaults to pyramid__element)
         let elementClassName = this.classes("element").className;
