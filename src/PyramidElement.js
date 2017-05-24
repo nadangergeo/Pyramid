@@ -230,8 +230,8 @@ class PyramidElement extends React.PureComponent {
             position: "absolute",
             top: this.props.top,
             left: this.props.left,
-            zIndex: this.state.zoomedIn || this.state.zoomingIn || this.state.zoomingOut ? 1000 : "auto",
-            cursor: this.props.zoomable ? "pointer" : "default"
+            zIndex: this.state.zoomedIn || this.state.zoomingIn || this.state.zoomingOut ? 2000 : "auto",
+            cursor: element.props.zoomable ? "pointer" : "default"
         });
 
         if(element.props.center) {
