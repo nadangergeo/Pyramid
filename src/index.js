@@ -19,7 +19,6 @@ export default class Pyramid extends React.PureComponent {
         style: React.PropTypes.object,
         scroller: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.object]),
         erd: React.PropTypes.object,
-        zoomable: React.PropTypes.bool,
         onWillZoomIn: React.PropTypes.func,
         onWillZoomOut: React.PropTypes.func,
         onDidZoomIn: React.PropTypes.func,
@@ -41,7 +40,6 @@ export default class Pyramid extends React.PureComponent {
         gutter: 20,
         padding: 20,
         derenderIfNotInViewAnymore: false,
-        zoomable: false,
         scroller: true
     };
 
@@ -377,11 +375,10 @@ export default class Pyramid extends React.PureComponent {
                 zoomTransition: this.props.zoomTransition ? this.props.zoomTransition : null,
                 index: index,
                 erd: this.erd,
-                onResize: this.updateMeasurements.bind(this),
-                zoomable: this.props.zoomable && (this.props.zoomedIn || typeof this.props.zoomedIn === "undefined")
+                onResize: this.updateMeasurements.bind(this)
             });
 
-            if(this.props.zoomable) {
+            if(element.props.zoomable) {
                 elementProps = Object.assign(elementProps, {
                     onWillZoomIn: this.willZoomIn.bind(this),
                     onWillZoomOut: this.willZoomOut.bind(this),
@@ -389,6 +386,10 @@ export default class Pyramid extends React.PureComponent {
                     onDidZoomOut: this.didZoomOut.bind(this),
                     pyramidScrollTop: this.getScrollTop()
                 });
+
+                if(this.state.zoomedIn) {
+                    elementProps.zoomable = false;
+                }
             }
 
             // If the element is NOT in the first row
