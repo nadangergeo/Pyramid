@@ -454,7 +454,7 @@ export default class Pyramid extends React.PureComponent {
 
         if(this.props.scroller === true) {
             pyramidStyle = Object.assign(pyramidStyle, {
-                height: "100%",
+                // height: "100%",
                 overflowY: "auto",
                 MsOverflowStyle: "-ms-autohiding-scrollbar",
                 WebkitOverflowScrolling: "touch"
