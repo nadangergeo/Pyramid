@@ -26,22 +26,20 @@ class Demo extends React.Component {
             height: "100%"
         };
 
-        let demos = [
-            <Giphy key="0" width={"100"} height="100" zoomedIn={true} />,
-            <Images key="1" width={"100"} height="100" zoomedIn={true} />
-        ];
-
         let numberOfColumns = {
-            default: 2
+            default: 1
         };
 
         return (
-            <Pyramid numberOfColumns={numberOfColumns} erd={this.erd} style={pyramidStyle} zoomable={true} onElementClick={ (element, event) => console.log(element, event)}>
-                {demos}
+            <Pyramid zoomTransition="all 200ms linear" padding="0" gutter="5" numberOfColumns="1" erd={this.erd} style={pyramidStyle} zoomable={true} onElementClick={ (element, event) => console.log(element, event)}>
+                <Images width={"100"} height="15"/>
+                <Giphy width={"100"} height="15"/>
+                <Images width={"100"} height="15"/>
+                <Giphy width={"100"} height="15"/>
+                <Images width={"100"} height="15"/>
+                <Giphy width={"100"} height="15"/>
             </Pyramid>
         );
-
-        // return demos[1];
     }
 }
 

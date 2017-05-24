@@ -2,15 +2,16 @@ import React from "react";
 import elementResizeDetector from "element-resize-detector";
 
 import "./giphy.css";
+import ImageViewer from "./imageViewer";
 import Pyramid from "../../src";
 
 export default class Giphy extends React.Component {
-    static propTypes = { 
-        zoomedIn: React.PropTypes.bool
+    static propTypes = {
+        zoomable: React.PropTypes.bool
     };
 
     static defaultProps = { 
-        zoomedIn: false
+        zoomable: true
     };
 
     constructor(props) {
@@ -122,7 +123,11 @@ export default class Giphy extends React.Component {
         };
 
         let elements = this.state.gifs.map( (gif, index) => {
-            return <img center key={gif.src} src={gif.src} width={gif.width} height={gif.height}/>;
+            return (
+                <ImageViewer key={gif.src}>
+                    <img src={gif.src} width={gif.width} height={gif.height}/>
+                </ImageViewer>
+            );
         });
 
         let gifPyramid;
