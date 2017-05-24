@@ -224,7 +224,6 @@ class PyramidElement extends React.PureComponent {
 
         let containerStyle = Object.assign({}, this.styleNormalizer);
         containerStyle = Object.assign(containerStyle, {
-            backgroundColor: "rgba(0,0,0,0.1)",
             display: "block",
             width: isNaN(this.props.width) ? this.props.width : this.props.width + "px",
             height: isNaN(this.props.height) ? this.props.height : this.props.height + "px",
@@ -251,8 +250,7 @@ class PyramidElement extends React.PureComponent {
                 height: "100%",
                 overflowY: "auto",
                 MsOverflowStyle: "-ms-autohiding-scrollbar",
-                WebkitOverflowScrolling: "touch",
-                backgroundColor: "black"
+                WebkitOverflowScrolling: "touch"
             });
         }
 
