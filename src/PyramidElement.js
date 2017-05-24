@@ -234,14 +234,6 @@ class PyramidElement extends React.PureComponent {
             cursor: element.props.zoomable ? "pointer" : "default"
         });
 
-        if(element.props.center) {
-            containerStyle = Object.assign(containerStyle, {
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-            });
-        }
-
         if(this.state.zoomedIn || this.state.zoomingIn) {
             containerStyle = Object.assign(containerStyle, {
                 top: this.props.pyramidScrollTop,
@@ -296,8 +288,8 @@ class PyramidElement extends React.PureComponent {
         let elementProps = {
             style: elementStyle,
             onLoad: this.isMediaType() ? this.handleImageLoaded.bind(this) : null,
-            width: null, //nullify because it is not needed anymore
-            height: null, //nullify because it is not needed anymore
+            width: null,
+            height: null,
             ref: element.ref ? element.ref : "element",
         }
 
