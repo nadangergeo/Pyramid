@@ -67,6 +67,7 @@ export default class Pyramid extends React.PureComponent {
         // Create initial state.
         this.state = {
             zoomedIn: false,
+            zoomedOut: true,
             zoomingIn: false,
             zoomingOut: false,
             measurements: {}
@@ -169,6 +170,7 @@ export default class Pyramid extends React.PureComponent {
 
             this.setState({
                 zoomedIn: false,
+                zoomedOut: false,
                 zoomingIn: true,
                 zoomingOut: false
             });
@@ -182,9 +184,10 @@ export default class Pyramid extends React.PureComponent {
             }
 
             this.setState({
-                zoomedIn: true,
+                zoomedIn: false,
+                zoomedOut: false,
                 zoomingIn: false,
-                zoomingOut: false
+                zoomingOut: true
             });
     }
 
@@ -197,6 +200,7 @@ export default class Pyramid extends React.PureComponent {
 
             this.setState({
                 zoomedIn: true,
+                zoomedOut: false,
                 zoomingIn: false,
                 zoomingOut: false
             });
@@ -211,6 +215,7 @@ export default class Pyramid extends React.PureComponent {
 
             this.setState({
                 zoomedIn: false,
+                zoomedOut: true,
                 zoomingIn: false,
                 zoomingOut: false
             });
@@ -475,7 +480,7 @@ export default class Pyramid extends React.PureComponent {
         let pyramidClassesOptions = {
             modifiers: {
                 "zoomedIn": this.state.zoomedIn,
-                "zoomedOut": !this.state.zoomedIn,
+                "zoomedOut": this.state.zoomedOut,
                 "zoomingIn": this.state.zoomingIn,
                 "zoomingOut": this.state.zoomingOut
             }

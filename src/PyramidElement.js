@@ -46,6 +46,7 @@ class PyramidElement extends React.PureComponent {
         this.state = {
             loaded: this.isMediaType() ? false : true,
             zoomedIn: false,
+            zoomedOut: true,
             zoomingIn: false,
             zoomingOut: false
         };
@@ -102,7 +103,7 @@ class PyramidElement extends React.PureComponent {
         let width = element.clientWidth;
         let height = element.clientHeight;
 
-        if((!this.state.zoomingIn && !this.state.zoomingOut && !this.state.zoomedIn)) {
+        if(this.state.zoomedOut) {
             this.props.onResize(this.props.index, width, height);
         }
     }
@@ -152,6 +153,7 @@ class PyramidElement extends React.PureComponent {
 
         this.setState({
             zoomedIn: false,
+            zoomedOut: false,
             zoomingIn: true,
             zoomingOut: false
         });
@@ -171,6 +173,7 @@ class PyramidElement extends React.PureComponent {
 
         this.setState({
             zoomedIn: false,
+            zoomedOut: false,
             zoomingIn: false,
             zoomingOut: true
         });
@@ -189,6 +192,7 @@ class PyramidElement extends React.PureComponent {
 
         this.setState({
             zoomedIn: true,
+            zoomedOut: false,
             zoomingIn: false,
             zoomingOut: false
         });
@@ -207,6 +211,7 @@ class PyramidElement extends React.PureComponent {
 
         this.setState({
             zoomedIn: false,
+            zoomedOut: true,
             zoomingIn: false,
             zoomingOut: false
         });
@@ -255,7 +260,7 @@ class PyramidElement extends React.PureComponent {
         let containerClassesOptions = {
             modifiers: element.props.zoomable ? {
                 "zoomedIn": this.state.zoomedIn,
-                "zoomedOut": !this.state.zoomedIn,
+                "zoomedOut": this.state.zoomedOut,
                 "zoomingIn": this.state.zoomingIn,
                 "zoomingOut": this.state.zoomingOut
             } : null
@@ -301,6 +306,7 @@ class PyramidElement extends React.PureComponent {
                 elementProps.zoomIn = this.zoomIn.bind(this);
                 elementProps.zoomOut = this.zoomOut.bind(this);
                 elementProps.zoomedIn = this.state.zoomedIn;
+                elementProps.zoomedOut = this.state.zoomedOut;
                 elementProps.zoomingIn = this.state.zoomingIn;
                 elementProps.zoomingOut = this.state.zoomingOut;    
             }
