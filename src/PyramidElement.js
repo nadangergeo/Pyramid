@@ -141,6 +141,12 @@ class PyramidElement extends React.PureComponent {
 
     zoomIn(event) {
         event.stopPropagation();
+
+        if(this.state.zoomedIn) {
+            // already zoomed in
+            return;
+        }
+
         let element = this.props.children;
 
         if(typeof element.props.onWillZoomIn === "function") {
@@ -161,6 +167,12 @@ class PyramidElement extends React.PureComponent {
 
     zoomOut(event) {
         event.stopPropagation();
+
+        if(this.state.zoomedOut) {
+            // already zoomed out
+            return;
+        }
+
         let element = this.props.children;
 
         if(typeof element.props.onWillZoomOut === "function") {
@@ -235,8 +247,7 @@ class PyramidElement extends React.PureComponent {
             position: "absolute",
             top: this.props.top,
             left: this.props.left,
-            zIndex: this.state.zoomedIn || this.state.zoomingIn || this.state.zoomingOut ? 2000 : "auto",
-            cursor: element.props.zoomable ? "pointer" : "default"
+            zIndex: !this.state.zoomedOut ? 2000 : "auto"
         });
 
         if(this.state.zoomedIn || this.state.zoomingIn) {
@@ -268,8 +279,7 @@ class PyramidElement extends React.PureComponent {
 
         let containerProps = {
             style: containerStyle,
-            className: this.classes(containerClassesOptions).className,
-            onClick: element.props.zoomable && !this.state.zoomedIn ? this.zoomIn.bind(this) : null
+            className: this.classes(containerClassesOptions).className
         }
 
         // Element
