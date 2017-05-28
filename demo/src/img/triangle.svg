@@ -4,5 +4,5 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="1000px" height="1000px" viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve">
 <rect fill="#FFFFFF" width="1000" height="1000"/>
-<rect x="250" y="250" width="500" height="500"/>
+<polygon points="500,716.5 250,716.5 375,500 500,283.5 625,500 750,716.5 "/>
 </svg>

@@ -6,14 +6,14 @@ import ImageViewer from "./imageViewer";
 import CloseButton from "./closeButton";
 import Cover from "./cover";
 
-import circle from "./img/circle.png";
-import triangle from "./img/triangle.png";
-import square from "./img/square.png";
-import star from "./img/star.png";
-import hexagon from "./img/hexagon.png";
-import patternSquare from "./img/pattern_square.png";
-import patternPortrait from "./img/pattern_portrait.png";
-import patternLandscape from "./img/pattern_landscape.png";
+import circle from "./img/circle.svg";
+import triangle from "./img/triangle.svg";
+import square from "./img/square.svg";
+import star from "./img/star.svg";
+import hexagon from "./img/hexagon.svg";
+import patternSquare from "./img/pattern_square.svg";
+import patternPortrait from "./img/pattern_portrait.svg";
+import patternLandscape from "./img/pattern_landscape.svg";
 
 export default class Images extends React.Component {
     static propTypes = {
