@@ -7,7 +7,6 @@ class ImageViewer extends React.PureComponent {
     static propTypes = {
         zoomable: React.PropTypes.bool,
         inView: React.PropTypes.bool
-        
     };
 
     static defaultProps = { 
@@ -70,7 +69,9 @@ class ImageViewer extends React.PureComponent {
             position: "relative",
             width: "100%",
             paddingBottom: ((image.props.height / image.props.width) * 100) + "%",
-            cursor: this.props.zoomedOut ? "pointer" : "auto" 
+            cursor: this.props.zoomedOut ? "pointer" : "auto",
+            opacity: this.props.inView && this.state.loaded ? 1 : 0,
+            transition: "opacity 300ms linear"
         }
 
         let imageStyle = Object.assign({}, this.styleNormalizer);
@@ -80,8 +81,6 @@ class ImageViewer extends React.PureComponent {
             left: 0,
             width: "100%",
             height: "auto",
-            opacity: this.props.inView && this.state.loaded ? 1 : 0,
-            transition: "opacity 300ms linear",
             boxSizing: "border-box",
         });
 

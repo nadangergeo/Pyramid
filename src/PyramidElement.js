@@ -247,7 +247,9 @@ class PyramidElement extends React.PureComponent {
             position: "absolute",
             top: this.props.top,
             left: this.props.left,
-            zIndex: !this.state.zoomedOut ? 2000 : "auto"
+            zIndex: !this.state.zoomedOut ? 2000 : "auto",
+            opacity: this.props.inView && this.state.loaded ? 1 : 0,
+            transition: "opacity 300ms linear"
         });
 
         if(this.state.zoomedIn || this.state.zoomingIn) {
@@ -289,8 +291,6 @@ class PyramidElement extends React.PureComponent {
         elementStyle = Object.assign(elementStyle, {
             width: "100%",
             height: "auto",
-            opacity: this.props.inView && this.state.loaded ? 1 : 0,
-            transition: "opacity 300ms linear",
             boxSizing: "border-box",
             // WebkitTransform: "translateZ(0)", //GPU-acceleration, does it help?
             // transform: "translateZ(0)"
