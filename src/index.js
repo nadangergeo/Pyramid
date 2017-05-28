@@ -131,6 +131,11 @@ export default class Pyramid extends React.PureComponent {
     }
 
     handleScroll(event) {
+        if(this.state.zoomedIn) {
+            event.preventDefault();
+            return;
+        }
+
         this.reRender();
     }
 
