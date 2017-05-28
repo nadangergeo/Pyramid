@@ -349,6 +349,7 @@ export default class Pyramid extends React.PureComponent {
 
         for (var index = 0; index < elements.length; index++) {
             let element = elements[index];
+            let key = element.key || index;
 
             // Declare the height of the element.
             let elementHeight;
@@ -358,9 +359,9 @@ export default class Pyramid extends React.PureComponent {
                 elementHeight = (elementWidth / element.props.width) * element.props.height;
             }
             // If the dimensions of the element have been measured
-            else if(this.state.measurements[index]) {
+            else if(this.state.measurements[key]) {
                 // use measurements to determine height
-                elementHeight = this.state.measurements[index].height;
+                elementHeight = this.state.measurements[key].height;
             } 
             // Uknown height
             else {
@@ -378,7 +379,7 @@ export default class Pyramid extends React.PureComponent {
                 height: elementHeight,
                 inView: this.allElementProps[index] ? this.allElementProps[index].inView : false,
                 zoomTransition: this.props.zoomTransition ? this.props.zoomTransition : null,
-                index: index,
+                index: key,
                 erd: this.erd,
                 onResize: this.updateMeasurements.bind(this)
             });
@@ -432,12 +433,12 @@ export default class Pyramid extends React.PureComponent {
 
             // Finally! Let's return our pyramid element. 
             elementsToRender.push(
-                <PyramidElement ref={"element" + index} className={elementClassName} key={index} {...elementProps}>
+                <PyramidElement ref={"element" + index} className={elementClassName} key={key} {...elementProps}>
                     {element}
                 </PyramidElement>
             );
 
-            if(elementProps.height === "auto" && !this.state.measurements[index]) {
+            if(elementProps.height === "auto" && !this.state.measurements[key]) {
                 // let this be the last element to render for now
                 // we need to let it mount so that we can determine its dimensions
                 break;
