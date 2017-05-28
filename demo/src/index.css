@@ -1,3 +1,4 @@
+/* Scaffolding */
 html, body, #demo {
     margin: 0;
     padding: 0;
@@ -17,6 +18,15 @@ body {
     background-color: rgba(255, 255, 255, 0.161803398875);
 }
 
+/* For when zooming in a Pyramid that is not initially top: 0; */
+.pyramid--zoomingIn,
+.pyramid--zoomingOut {
+    transition: top 200ms linear;
+}
+
+/*  You can apply a transition like this, or you can use the zoomTransition prop.
+    This zoom in transition will apply to all elements while they are zooming in/out
+    except for the elements in pyramids which have a zoomTransition set via props (that style has a higher specificity) */
 .pyramid__element--zoomingIn,
 .pyramid__element--zoomingOut {
     transition: all 200ms cubic-bezier(.63,-0.43,.33,1.41);
@@ -27,31 +37,5 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background-color: #000;
-}
-
-.demo__cover {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 100;
-    height: 100%;
-    overflow: hidden;
-    background-color: #000;
-    color: #fff;
-    opacity: 1;
-    transition: all 200ms linear;
-}
-
-.demo__header {
-    display: block;
-    text-align: center;
-    font-size: 4vw;
-    letter-spacing: -0.05em;
-    transition: all 200ms linear;
+    background-color: #ccc;
 }

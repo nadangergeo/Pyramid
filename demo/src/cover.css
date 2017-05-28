@@ -1,0 +1,24 @@
+.cover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    overflow: hidden;
+    background-color: #000;
+    color: #fff;
+    opacity: 1;
+    transition: all 200ms linear;
+}
+
+.cover__header {
+    display: block;
+    text-align: center;
+    font-size: 4vw;
+    letter-spacing: -0.05em;
+    transition: all 200ms linear;
+}

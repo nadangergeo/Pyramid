@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
+import CloseButton from "./closeButton";
+
 class ImageViewer extends React.PureComponent {
     static propTypes = {
         zoomable: React.PropTypes.bool,
@@ -61,36 +63,14 @@ class ImageViewer extends React.PureComponent {
             transition: "backgroundColor 200ms linear"
         });
 
-        // Close button
-        // ------------------------------------------------------------------------
-
-        let closeButtonStyle = Object.assign({}, this.styleNormalizer);
-        closeButtonStyle = {
-            display: "block",
-            padding: "10px",
-            position: "fixed",
-            zIndex: 1000,
-            top: "20px",
-            left: "20px",
-            fill: "white",
-            backgroundColor: "black",
-            opacity: this.props.zoomedIn ? 1 : 0,
-            transition: "opacity 200ms linear"
-        }
-
-        let closeButton = this.props.zoomingIn || this.props.zoomedIn ? (
-            <div style={closeButtonStyle} onClick={this.props.zoomOut}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            </div>
-        ) : null;
-
         // Image
         // ------------------------------------------------------------------------
 
         let imageContainerStyle = {
             position: "relative",
             width: "100%",
-            paddingBottom: ((image.props.height / image.props.width) * 100) + "%"
+            paddingBottom: ((image.props.height / image.props.width) * 100) + "%",
+            cursor: this.props.zoomedOut ? "pointer" : "auto" 
         }
 
         let imageStyle = Object.assign({}, this.styleNormalizer);
@@ -115,8 +95,8 @@ class ImageViewer extends React.PureComponent {
         image= React.cloneElement(image, imageProps);
 
         return(
-            <div style={imageViewerStyle}>
-                {closeButton}
+            <div style={imageViewerStyle} onClick={this.props.zoomIn}>
+                <CloseButton {...this.props}/>
 
                 <div style={imageContainerStyle}>
                     {this.props.inView ? image: ""}

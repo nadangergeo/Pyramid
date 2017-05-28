@@ -8,6 +8,7 @@ import Pyramid from "../../src";
 //demos
 import Giphy from "./giphy";
 import Images from "./images.js";
+import Cinema from "./cinema.js";
 
 class Demo extends React.Component {
     constructor(props) {
@@ -26,18 +27,11 @@ class Demo extends React.Component {
             height: "100%"
         };
 
-        let numberOfColumns = {
-            default: 1
-        };
-
         return (
             <Pyramid zoomTransition="all 200ms linear" padding="0" gutter="5" numberOfColumns="1" erd={this.erd} style={pyramidStyle} zoomable={true} onElementClick={ (element, event) => console.log(element, event)}>
-                <Images width={"100"} height="15"/>
-                <Giphy width={"100"} height="15"/>
-                <Images width={"100"} height="15"/>
-                <Giphy width={"100"} height="15"/>
-                <Images width={"100"} height="15"/>
-                <Giphy width={"100"} height="15"/>
+                <Images width={"100"} height="20"/>
+                <Giphy width={"100"} height="20"/>
+                <Cinema width={"100"} height="20"/>
             </Pyramid>
         );
     }

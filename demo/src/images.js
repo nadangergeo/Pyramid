@@ -1,9 +1,10 @@
 import React from "react";
 import elementResizeDetector from "element-resize-detector";
 
-import "./images.css";
-import ImageViewer from "./imageViewer";
 import Pyramid from "../../src";
+import ImageViewer from "./imageViewer";
+import CloseButton from "./closeButton";
+import Cover from "./cover";
 
 import circle from "./img/circle.png";
 import triangle from "./img/triangle.png";
@@ -32,41 +33,10 @@ export default class Images extends React.Component {
 
     render() {
 
-        // Close button
-        // ------------------------------------------------------------------------
-
-        let closeButtonStyle = Object.assign({}, this.styleNormalizer);
-        closeButtonStyle = {
-            display: "block",
-            padding: "10px",
-            position: "fixed",
-            zIndex: 1000,
-            top: "30px",
-            left: "20px",
-            fill: "white",
-            backgroundColor: "black",
-            opacity: this.props.zoomedIn ? 1 : 0,
-            transition: "opacity 200ms linear"
-        }
-
-        let closeButton = this.props.zoomingIn || this.props.zoomedIn ? (
-            <div style={closeButtonStyle} onClick={this.props.zoomOut}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            </div>
-        ) : null;
-
         let pyramidStyle = {
-            height: "calc(100% - 120px)",
-            top: "120px",
+            height: "calc(100% - 100px)",
+            top: "100px",
         };
-
-        let coverStyle = {
-            height: this.props.zoomedIn || this.props.zoomingIn ? "120px" : "100%",
-        };
-
-        let headerStyle = {
-            fontSize: this.props.zoomedIn || this.props.zoomingIn ? "3em" : null,
-        }
 
         let images = [
             <p style={{padding:"20px", backgroundColor: "black", color: "white", lineHeight: "1.4"}} key={30}>This is a simple demo with images (and this paragraph with unknown height). Lorem ipsum dolor sit amet. Morbi a enim in magna semper bibendum. Etiam scelerisque, nunc ac egestas consequat, odio nibh euismod nulla, eget auctor orci nibh vel.</p>,
@@ -103,16 +73,12 @@ export default class Images extends React.Component {
             <img src={star} width="1000" height="1000" key={27}/>,
             <img src={patternPortrait} width="1000" height="1600" key={28}/>,
             <img src={hexagon} width="1000" height="1000" key={29}/>
-        ]
-
-        // images = images.map((img, index) => {
-        //     return (<ImageViewer key={index}>{img}</ImageViewer>)
-        // });
+        ];
 
         let imagesPyramid;
         if(this.props.zoomedIn || this.props.zoomingIn || this.props.zoomingOut){
             imagesPyramid = (
-                <Pyramid erd={this.erd} zoomable={true} style={pyramidStyle}>
+                <Pyramid erd={this.erd} style={pyramidStyle}>
                     {images}
                 </Pyramid>
             );
@@ -122,11 +88,8 @@ export default class Images extends React.Component {
 
         return (
             <div className="demo">
-                {closeButton}
-
-                <div className="demo__cover" style={coverStyle}>
-                    <h1 className="demo__header" style={headerStyle}>Images</h1>
-                </div>
+                <CloseButton {...this.props}/>
+                <Cover {...this.props}>Images</Cover>
 
                 {imagesPyramid}
             </div>
