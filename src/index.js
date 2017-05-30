@@ -14,6 +14,8 @@ export default class Pyramid extends React.PureComponent {
         className: React.PropTypes.string,
         gutter: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string, React.PropTypes.object]),
         padding: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string, React.PropTypes.object]),
+        extraPaddingTop: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
+        extraPaddingBottom: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
         zoomTransition: React.PropTypes.string,
         derenderIfNotInViewAnymore: React.PropTypes.bool,
         style: React.PropTypes.object,
@@ -39,6 +41,8 @@ export default class Pyramid extends React.PureComponent {
         className: "pyramid",
         gutter: 20,
         padding: 20,
+        extraPaddingTop: 0,
+        extraPaddingBottom: 0,
         derenderIfNotInViewAnymore: false,
         scroller: true
     };
@@ -317,6 +321,8 @@ export default class Pyramid extends React.PureComponent {
         let numberOfColumns = this.getResponsivePropValue("numberOfColumns");
         let magicValue = this.getResponsivePropValue("magicValue");
         let padding = this.getResponsivePropValue("padding");
+        let extraPaddingTop = this.getResponsivePropValue("extraPaddingTop");
+        let extraPaddingBottom = this.getResponsivePropValue("extraPaddingBottom");
         let gutter = this.getResponsivePropValue("gutter");
 
         // Define class for elements using BEMHelper (defaults to pyramid__element)
@@ -378,7 +384,7 @@ export default class Pyramid extends React.PureComponent {
             let elementProps = {};
 
             elementProps = Object.assign(elementProps, {
-                top: padding,
+                top: padding + extraPaddingTop,
                 left: padding,
                 width: elementWidth,
                 height: elementHeight,
@@ -410,7 +416,7 @@ export default class Pyramid extends React.PureComponent {
                 if(elementAbove) {
                     elementProps.top = elementAbove.top + elementAbove.height + gutter;
                 }
-            } 
+            }
 
             // If the element is NOT the first element in a row
             if(index % numberOfColumns > 0) {
@@ -460,7 +466,7 @@ export default class Pyramid extends React.PureComponent {
         // - Q: Okay... Have you tried...
         // - A: Shhh! This works, OKAY!? ¯\(°_o)/¯
         let bottomPadding = (
-            <div style={{width:"100%", height:maxBottom + padding, position: "absolute", display: "block", zIndex: "-1000"}}></div>
+            <div style={{width:"100%", height:maxBottom + padding + extraPaddingBottom, position: "absolute", display: "block", zIndex: "-1000"}}></div>
         );
 
         if(this.props.scroller === true) {
@@ -478,7 +484,6 @@ export default class Pyramid extends React.PureComponent {
 
         if(this.state.zoomingIn || this.state.zoomedIn) {
             pyramidStyle = Object.assign(pyramidStyle, {
-                zIndex: 1000,
                 overflowY: "hidden"
             });
         }
