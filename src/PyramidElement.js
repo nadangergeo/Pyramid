@@ -247,7 +247,7 @@ class PyramidElement extends React.PureComponent {
             position: "absolute",
             top: this.props.top,
             left: this.props.left,
-            zIndex: !this.state.zoomedOut ? 2000 : "auto",
+            zIndex: !this.state.zoomedOut ? 10000 : 0,
             opacity: this.props.inView && this.state.loaded ? 1 : 0,
             transition: "opacity 300ms linear"
         });
@@ -305,12 +305,14 @@ class PyramidElement extends React.PureComponent {
             onLoad: this.isMediaType() ? this.handleImageLoaded.bind(this) : null,
             width: null,
             height: null,
-            ref: element.ref ? element.ref : "element",
+            ref: element.ref ? element.ref : "element"
         }
 
         if(this.isReactElement()) {            
             elementProps.erd = this.erd;
             elementProps.inView = this.props.inView;
+            elementProps.containerWidth = this.props.width;
+            elementProps.containerHeight = this.props.height;
 
             if(element.props.zoomable) {
                 elementProps.zoomIn = this.zoomIn.bind(this);
