@@ -3,7 +3,6 @@ import elementResizeDetector from "element-resize-detector";
 
 import Pyramid from "../../src";
 import ImageViewer from "./imageViewer";
-import CloseButton from "./closeButton";
 import Cover from "./cover";
 
 import circle from "./img/circle.svg";
@@ -33,12 +32,12 @@ export default class Images extends React.Component {
 
     render() {
 
-        let pyramidStyle = {
+        const pyramidStyle = {
             height: "calc(100% - 100px)",
             top: "100px",
         };
 
-        let images = [
+        const images = [
             <p style={{padding:"20px", backgroundColor: "black", color: "white", lineHeight: "1.4"}} key={30}>This is a simple demo with images (and this paragraph with unknown height). Lorem ipsum dolor sit amet. Morbi a enim in magna semper bibendum. Etiam scelerisque, nunc ac egestas consequat, odio nibh euismod nulla, eget auctor orci nibh vel.</p>,
 
             <img src={patternSquare} width="1000" height="1000" key={0}/>,
@@ -88,7 +87,6 @@ export default class Images extends React.Component {
 
         return (
             <div className="demo">
-                <CloseButton {...this.props}/>
                 <Cover {...this.props}>Images</Cover>
 
                 {imagesPyramid}

@@ -54,12 +54,10 @@ class ImageViewer extends React.PureComponent {
         imageViewerStyle = Object.assign(imageViewerStyle, {
             backgroundColor: this.props.zoomedIn || this.props.zoomingIn || this.props.zoomingOut ? "black" : "rgba(0,0,0,0.1)",
             width: "100%",
-            height: this.props.zoomedIn || this.props.zoomingIn ? "100%" : "auto",
+            height: this.props.zoomedIn || this.props.zoomingIn ||  this.props.zoomingOut ? "100%" : "auto",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             position: "relative",
-            transition: "backgroundColor 200ms linear"
+            transition: "backgroundColor 300ms linear"
         });
 
         // Image
@@ -67,11 +65,12 @@ class ImageViewer extends React.PureComponent {
 
         let imageContainerStyle = {
             position: "relative",
+            margin: "auto",
             width: "100%",
             paddingBottom: ((image.props.height / image.props.width) * 100) + "%",
             cursor: this.props.zoomedOut ? "pointer" : "auto",
             opacity: this.props.inView && this.state.loaded ? 1 : 0,
-            transition: "opacity 300ms linear"
+            transition: "opacity 300ms linear",
         }
 
         let imageStyle = Object.assign({}, this.styleNormalizer);
@@ -95,7 +94,7 @@ class ImageViewer extends React.PureComponent {
 
         return(
             <div style={imageViewerStyle} onClick={this.props.zoomIn}>
-                <CloseButton {...this.props}/>
+                <CloseButton {...this.props} position="fixed"/>
 
                 <div style={imageContainerStyle}>
                     {this.props.inView ? image: ""}

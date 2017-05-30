@@ -9,6 +9,7 @@ import Pyramid from "../../src";
 import Giphy from "./giphy";
 import Images from "./images.js";
 import Cinema from "./cinema.js";
+import Docs from "./docs.js";
 
 class Demo extends React.Component {
     constructor(props) {
@@ -28,10 +29,11 @@ class Demo extends React.Component {
         };
 
         return (
-            <Pyramid zoomTransition="all 200ms linear" padding="0" gutter="5" numberOfColumns="1" erd={this.erd} style={pyramidStyle} zoomable={true} onElementClick={ (element, event) => console.log(element, event)}>
-                <Images width={"100"} height="20"/>
-                <Giphy width={"100"} height="20"/>
-                <Cinema width={"100"} height="20"/>
+            <Pyramid zoomTransition="all 200ms linear" padding="0" gutter="0" numberOfColumns="1" erd={this.erd} style={pyramidStyle} zoomable={true} onElementClick={ (element, event) => console.log(element, event)}>
+                <Images width="100" height="20"/>
+                <Giphy width="100" height="20" themeColor="#7e00ff"/>
+                <Cinema width="100" height="20" themeColor="#ff1b00" />
+                <Docs width="100" height="20" themeColor="#ffba00"/>
             </Pyramid>
         );
     }

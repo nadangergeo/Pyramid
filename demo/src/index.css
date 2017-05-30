@@ -14,14 +14,38 @@ body {
     background-color: #ccc;
 }
 
-.pyramid__element {
-    background-color: rgba(255, 255, 255, 0.161803398875);
+h1 {
+    font-size: 4em;
+    letter-spacing: -0.05em;
+    margin-top: 0;
+    margin-bottom: 1em;
 }
 
-/* For when zooming in a Pyramid that is not initially top: 0; */
-.pyramid--zoomingIn,
-.pyramid--zoomingOut {
-    transition: top 200ms linear;
+h2 {
+    margin-top: 0;
+    margin-bottom: 0em;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 1em;
+    line-height: 1.4;
+}
+
+button {
+    padding: 15px 30px;
+    background: black;
+    color: white;
+    border: none;
+    font-size: 1.5em;
+    font-weight: bold;
+    letter-spacing: -0.05em;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.pyramid__element {
+    background-color: rgba(255, 255, 255, 0.161803398875);
 }
 
 /*  You can apply a transition like this, or you can use the zoomTransition prop.
@@ -29,11 +53,12 @@ body {
     except for the elements in pyramids which have a zoomTransition set via props (that style has a higher specificity) */
 .pyramid__element--zoomingIn,
 .pyramid__element--zoomingOut {
-    transition: all 200ms cubic-bezier(.63,-0.43,.33,1.41);
+    transition: all 300ms cubic-bezier(.63,-0.43,.33,1.41);
 }
 
 .demo {
     position: relative;
+    z-index: 100;
     width: 100%;
     height: 100%;
     overflow: hidden;

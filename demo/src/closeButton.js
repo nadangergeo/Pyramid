@@ -1,18 +1,28 @@
 import React from "react";
 
 export default class CloseButton extends React.Component {
+	static propTypes = {
+		themeColor: React.PropTypes.string,
+		position: React.PropTypes.string
+	};
+
+	static defaultProps = { 
+		themeColor: "black",
+		position: "absolute"
+	};
+
 	render() {
 		const closeButtonStyle = {
 		    display: "block",
 		    padding: "10px",
-		    position: "fixed",
-		    zIndex: 1000,
+		    position: this.props.position,
+		    zIndex: 100,
 		    top: "20px",
 		    left: "20px",
 		    fill: "white",
-		    backgroundColor: "black",
+		    backgroundColor: this.props.themeColor,
 		    opacity: this.props.zoomedIn ? 1 : 0,
-		    transition: "opacity 200ms linear",
+		    transition: "opacity 300ms linear",
 		    cursor: "pointer"
 		};
 

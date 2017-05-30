@@ -8,17 +8,20 @@
     bottom: 0;
     right: 0;
     z-index: 100;
-    overflow: hidden;
+    overflow: visible;
     background-color: #000;
     color: #fff;
     opacity: 1;
     transition: all 200ms linear;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.3);
 }
 
 .cover__header {
     display: block;
     text-align: center;
-    font-size: 4vw;
+    font-size: 2em;
     letter-spacing: -0.05em;
     transition: all 200ms linear;
+    margin-bottom: 0;
+    margin-top: 0;
 }

@@ -4,7 +4,6 @@ import elementResizeDetector from "element-resize-detector";
 import "./giphy.css";
 import Pyramid from "../../src";
 import ImageViewer from "./imageViewer";
-import CloseButton from "./closeButton";
 import Cover from "./cover";
 
 export default class Giphy extends React.Component {
@@ -24,10 +23,10 @@ export default class Giphy extends React.Component {
 
         this.state = {
             gifs: [],
-            hideSearch: false
+            fullscreen: false
         }
 
-        this.defaultSearch = "trippy";
+        this.defaultSearch = "cats";
     }
 
     componentWillReceiveProps(nextProps) {
@@ -59,13 +58,13 @@ export default class Giphy extends React.Component {
 
     handlePyramidWillZoomIn(event) {
         this.setState({
-            hideSearch: true
+            fullscreen: true
         });
     }
 
     handlePyramidWillZoomOut(event) {
         this.setState({
-            hideSearch: false
+            fullscreen: false
         });
     }
 
@@ -73,12 +72,13 @@ export default class Giphy extends React.Component {
         var _this = this;
 
         //fetch gifs from giphy
-        fetch("http://api.giphy.com/v1/gifs/search?q=" + searchQuery + "&limit=20&api_key=dc6zaTOxFJmzC")
+        fetch("http://api.giphy.com/v1/gifs/search?q=" + searchQuery + "&limit=100&api_key=dc6zaTOxFJmzC")
         .then(response => response.json())
         .then(json => {
             let data = json.data;
             let gifs = data.map(gif => {
                 let image = gif.images.downsized;
+                // let image = gif.images.downsized_still;
 
                 return {
                     src: image.url,
@@ -108,17 +108,26 @@ export default class Giphy extends React.Component {
     }
 
     render() {
-        let demoStyle = {};
+        const pyramidStyle = {
+            height: "100%",
+            position: "absolute", // This allows the elements' positions be relative to the demo
+            zIndex: "auto",
+            top: 0
+        };
 
-        let pyramidStyle = {
-            height: this.state.hideSearch ? "100%" : "calc(100% - 200px)",
-            top: this.state.hideSearch ? "0px" : "100px",
-            bottom: this.state.hideSearch ? "0px" : "100px"
+        const numberOfColumns = {
+            default: 1,
+            breakpoints: {
+                "768px"  : 3,
+                "1024px" : 4,
+                "1280px" : 5,
+                "1440px" : 6
+            }
         };
 
         let inputContainerStyle = {
-            // bottom: this.state.hideSearch ? "-120px" : "0px",
-        };
+            bottom: this.props.zoomedIn ? "0" : "-120px",
+        }
 
         let elements = this.state.gifs.map( (gif, index) => {
             return (
@@ -135,7 +144,10 @@ export default class Giphy extends React.Component {
                 onWillZoomIn: this.handlePyramidWillZoomIn.bind(this),
                 onWillZoomOut: this.handlePyramidWillZoomOut.bind(this),
                 style: pyramidStyle,
-                derenderIfNotInViewAnymore: true
+                derenderIfNotInViewAnymore: true,
+                numberOfColumns,
+                extraPaddingTop: 100,
+                extraPaddingBottom: 100
             }
 
             gifPyramid = (
@@ -149,10 +161,9 @@ export default class Giphy extends React.Component {
 
         return (
             <div className="demo">
-                <CloseButton {...this.props}/>
                 <Cover {...this.props}>Giphy</Cover>
 
-                <div style={inputContainerStyle} className="input-container">
+                <div className="input-container" style={inputContainerStyle}>
                     <input ref="input" type="search" placeholder="Search Giphy…" onChange={this.handleSearch.bind(this)} onClick={this.handleSearchClick.bind(this)} />
                 </div>
 
