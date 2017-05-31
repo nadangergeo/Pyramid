@@ -52,11 +52,10 @@ class ImageViewer extends React.PureComponent {
 
 		let imageViewerStyle = Object.assign({}, this.styleNormalizer);
 		imageViewerStyle = Object.assign(imageViewerStyle, {
+			display: "flex",
 			backgroundColor: this.props.zoomedIn || this.props.zoomingIn || this.props.zoomingOut ? "black" : "rgba(0,0,0,0.1)",
 			width: "100%",
 			height: this.props.zoomedIn || this.props.zoomingIn ||  this.props.zoomingOut ? "100%" : "auto",
-			display: "flex",
-			position: "relative",
 			transition: "backgroundColor 300ms linear"
 		});
 

@@ -50,27 +50,24 @@ class Film extends React.PureComponent {
 
 		const filmStyle = {
 			backgroundColor: this.props.zoomedIn || this.props.zoomingIn || this.props.zoomingOut ? "black" : "rgba(0,0,0,0.1)",
-			cursor: this.props.zoomedOut ? "pointer" : "auto",
-			width: this.props.zoomedOut ? this.props.containerWidth : "100%",
-			height: this.props.zoomedOut ? this.props.containerWidth / posterData.width * posterData.height : "auto"
+			width: "100%",
+			height: this.props.zoomedIn || this.props.zoomingIn ||  this.props.zoomingOut ? "100%" : "auto",
 		};
 
 		// Poster
 		// ------------------------------------------------------------------------
 
 		const posterContainerStyle = {
-			width: this.props.zoomedIn || this.props.zoomingIn ? "50%" : this.props.containerWidth,
-		}
-
-		const posterStyle = {
-			opacity: this.props.inView && this.state.loaded ? 1 : 0,
+			width: this.props.zoomedIn || this.props.zoomingIn ? "50%" : "100%",
+			paddingBottom: ((posterData.height / posterData.width) * 100)  * (this.props.zoomedIn || this.props.zoomingIn ? 0.5 : 1) + "%",
+			cursor: this.props.zoomedOut ? "pointer" : "auto",
 			transform: this.props.zoomedIn || this.props.zoomingIn ? "scale(0.8)" : "none",
-		};
+			opacity: this.props.inView && this.state.loaded ? 1 : 0
+		}
 
 		const posterProps = {
 			src: posterData.src,
 			className: "film__poster",
-			style: posterStyle,
 			onLoad: this.handlePosterLoaded.bind(this),
 			width: null,
 			height: null
@@ -82,7 +79,9 @@ class Film extends React.PureComponent {
 		// ------------------------------------------------------------------------
 
 		const infoStyle = {
-			opacity: this.props.zoomedIn ? 1 : 0
+			opacity: this.props.zoomedIn ? 1 : 0,
+			maxHeight: this.props.zoomedOut || this.props.zoomingOut ? 0 : "100%",
+			overflow: this.props.zoomedOut || this.props.zoomingOut ? "hidden" : "visible"
 		};
 
 		const genres = data.genres.map( (genre, index) => {
