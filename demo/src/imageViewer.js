@@ -93,7 +93,7 @@ class ImageViewer extends React.PureComponent {
 		image= React.cloneElement(image, imageProps);
 
 		return(
-			<div style={imageViewerStyle} onClick={this.props.zoomIn}>
+			<div style={imageViewerStyle} onClick={this.props.zoomIn} onMouseOver={this.props.onMouseOver} onMouseOut={this.props.onMouseOut}>
 				<CloseButton {...this.props} position="fixed"/>
 
 				<div style={imageContainerStyle}>

@@ -3,6 +3,7 @@ import elementResizeDetector from "element-resize-detector";
 
 import "./giphy.css";
 import Pyramid from "../../src";
+import GifViewer from "./gifViewer";
 import ImageViewer from "./imageViewer";
 import Cover from "./cover";
 
@@ -78,11 +79,12 @@ export default class Giphy extends React.Component {
 			let data = json.data;
 			let gifs = data.map(gif => {
 				let image = gif.images.downsized;
-				// let image = gif.images.downsized_still;
+				let still = gif.images.downsized_still;
 
 				return {
+					id: gif.id,
 					src: image.url,
-					href: image.url,
+					stillSrc: still.url,
 					width: image.width,
 					height: image.height
 				}
@@ -130,10 +132,11 @@ export default class Giphy extends React.Component {
 		}
 
 		let elements = this.state.gifs.map( (gif, index) => {
-			return (
-				<ImageViewer key={gif.src}>
-					<img src={gif.src} width={gif.width} height={gif.height}/>
-				</ImageViewer>
+			return (				
+				<GifViewer key={gif.id} gif={gif}/>
+				// <ImageViewer key={gif.src}>
+					// <img src={gif.src} width={gif.width} height={gif.height}/>
+				// </ImageViewer>
 			);
 		});
 
