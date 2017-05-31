@@ -5,32 +5,32 @@ import Pyramid from "../../src";
 import Cover from "./cover";
 
 export default class Docs extends React.Component {
-    static propTypes = {
-        zoomable: React.PropTypes.bool
-    };
+	static propTypes = {
+		zoomable: React.PropTypes.bool
+	};
 
-    static defaultProps = { 
-        zoomable: true
-    };
+	static defaultProps = { 
+		zoomable: true
+	};
 
-    constructor(props) {
-        super(props);
+	constructor(props) {
+		super(props);
 
-        // Create a elementResizeDetector.
-        this.erd = props.erd || elementResizeDetector({strategy: "scroll"});
-    }
+		// Create a elementResizeDetector.
+		this.erd = props.erd || elementResizeDetector({strategy: "scroll"});
+	}
 
-    render() {
+	render() {
 
-        const pyramidStyle = {
-            height: "calc(100% - 100px)",
-            top: "100px",
-        };
+		const pyramidStyle = {
+			height: "calc(100% - 100px)",
+			top: "100px",
+		};
 
-        return (
-            <div className="demo">
-                <Cover {...this.props}>Docs</Cover>
-            </div>
-        );
-    }
+		return (
+			<div className="demo">
+				<Cover {...this.props}>Docs</Cover>
+			</div>
+		);
+	}
 }

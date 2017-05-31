@@ -12,31 +12,31 @@ import Cinema from "./cinema.js";
 import Docs from "./docs.js";
 
 class Demo extends React.Component {
-    constructor(props) {
-        super(props);
+	constructor(props) {
+		super(props);
 
-        // Create a elementResizeDetector.
-        this.erd = props.erd || elementResizeDetector({strategy: "scroll"});
+		// Create a elementResizeDetector.
+		this.erd = props.erd || elementResizeDetector({strategy: "scroll"});
 
-        this.state = {
-            zoomedIn: false
-        }
-    }
+		this.state = {
+			zoomedIn: false
+		}
+	}
 
-    render() {
-        const pyramidStyle = {
-            height: "100%"
-        };
+	render() {
+		const pyramidStyle = {
+			height: "100%"
+		};
 
-        return (
-            <Pyramid zoomTransition="all 200ms linear" padding="0" gutter="0" numberOfColumns="1" erd={this.erd} style={pyramidStyle} zoomable={true} onElementClick={ (element, event) => console.log(element, event)}>
-                <Images width="100" height="20"/>
-                <Giphy width="100" height="20" themeColor="#7e00ff"/>
-                <Cinema width="100" height="20" themeColor="#ff1b00" />
-                <Docs width="100" height="20" themeColor="#ffba00"/>
-            </Pyramid>
-        );
-    }
+		return (
+			<Pyramid zoomTransition="all 200ms linear" padding="0" gutter="0" numberOfColumns="1" erd={this.erd} style={pyramidStyle} zoomable={true} onElementClick={ (element, event) => console.log(element, event)}>
+				<Images width="100" height="20"/>
+				<Giphy width="100" height="20" themeColor="#7e00ff"/>
+				<Cinema width="100" height="20" themeColor="#ff1b00" />
+				<Docs width="100" height="20" themeColor="#ffba00"/>
+			</Pyramid>
+		);
+	}
 }
 
 render(<Demo style="height:100%; width:100%;"/>, document.querySelector('#demo'))
