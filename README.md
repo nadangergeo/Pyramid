@@ -11,7 +11,7 @@ Magical responsive layout/masonry-grid component, built with react.
 - Layout react modules and/or elements
 - Can layout components/elements with unkown height
 - Virtual scrolling: only render components in view
-- Infinite scroll
+- Infinite scroll (WIP, method for when reaching bottom to be added)
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
 [build]: https://travis-ci.org/user/repo
@@ -24,7 +24,7 @@ Magical responsive layout/masonry-grid component, built with react.
 
 ## Demo
 
-WIP, but check it out! (works best in on "desktop" right now, so please view on a computer. There are some bugs that I need to iron out in iOS, and the demo isn't fully reponsive yet.)
+WIP, but check it out! (works best on "desktop" right now, so please view on a computer. There are some bugs that I need to iron out in iOS, and the demo isn't fully reponsive yet.)
 
 http://gergeo.se/pyramid-beta-demo/
 
