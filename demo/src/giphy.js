@@ -27,7 +27,7 @@ export default class Giphy extends React.Component {
 			fullscreen: false
 		}
 
-		this.defaultSearch = "cats";
+		this.defaultSearch = "trippy";
 	}
 
 	componentWillReceiveProps(nextProps) {
