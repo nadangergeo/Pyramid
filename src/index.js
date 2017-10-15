@@ -170,11 +170,19 @@ export default class Pyramid extends React.PureComponent {
 		}
 	}
 
-	willZoomIn() {
+	zoomIn(event, index) {
+		this.refs["element" + index].zoomIn(event);
+	}
+
+	zoomOut(event, index) {
+		this.refs["element" + index].zoomOut(event);
+	}
+
+	willZoomIn(index) {
 			// console.log("willZoomIn!");
 
 			if(typeof this.props.onWillZoomIn === "function") {
-				this.props.onWillZoomIn();
+				this.props.onWillZoomIn(index);
 			}
 
 			this.setState({
@@ -185,11 +193,11 @@ export default class Pyramid extends React.PureComponent {
 			});
 	}
 
-	willZoomOut() {
+	willZoomOut(index) {
 			// console.log("willZoomOut!");
 
 			if(typeof this.props.onWillZoomOut === "function") {
-				this.props.onWillZoomOut();
+				this.props.onWillZoomOut(index);
 			}
 
 			this.setState({
@@ -200,11 +208,11 @@ export default class Pyramid extends React.PureComponent {
 			});
 	}
 
-	didZoomIn() {
+	didZoomIn(index) {
 			// console.log("didZoomIn!");
 
 			if(typeof this.props.onDidZoomIn === "function") {
-				this.props.onDidZoomIn();
+				this.props.onDidZoomIn(index);
 			}
 
 			this.setState({
@@ -215,11 +223,11 @@ export default class Pyramid extends React.PureComponent {
 			});
 	}
 
-	didZoomOut() {
+	didZoomOut(index) {
 			// console.log("didZoomOut!");
 
 			if(typeof this.props.onDidZoomOut === "function") {
-				this.props.onDidZoomOut();
+				this.props.onDidZoomOut(index);
 			}
 
 			this.setState({

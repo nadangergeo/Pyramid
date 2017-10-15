@@ -155,7 +155,7 @@ class PyramidElement extends React.PureComponent {
 		}
 
 		if(typeof this.props.onWillZoomIn === "function") {
-			this.props.onWillZoomIn();
+			this.props.onWillZoomIn(this.props.index);
 		}
 
 		this.setState({
@@ -181,7 +181,7 @@ class PyramidElement extends React.PureComponent {
 		}
 
 		if(typeof this.props.onWillZoomOut === "function") {
-			this.props.onWillZoomOut();
+			this.props.onWillZoomOut(this.props.index);
 		}
 
 		this.setState({
@@ -200,7 +200,7 @@ class PyramidElement extends React.PureComponent {
 		}
 
 		if(typeof this.props.onDidZoomIn === "function") {
-			this.props.onDidZoomIn();
+			this.props.onDidZoomIn(this.props.index);
 		}
 
 		this.setState({
@@ -219,7 +219,7 @@ class PyramidElement extends React.PureComponent {
 		}
 
 		if(typeof this.props.onDidZoomOut === "function") {
-			this.props.onDidZoomOut();
+			this.props.onDidZoomOut(this.props.index);
 		}
 
 		this.setState({
