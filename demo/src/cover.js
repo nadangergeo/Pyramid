@@ -20,7 +20,8 @@ export default class Cover extends React.Component {
 			backgroundColor: this.props.themeColor,
 			height: this.props.zoomedIn || this.props.zoomingIn ? "100px" : "100%",
 			cursor: this.props.zoomedOut ? "pointer" : "auto",
-			zIndex: this.props.zIndex
+			zIndex: this.props.zIndex,
+			opacity: this.props.fullscreen ? 0 : 1
 		};
 
 		const headerStyle = {

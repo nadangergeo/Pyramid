@@ -15,11 +15,13 @@ export default class CloseButton extends React.Component {
 	render() {
 		const closeButtonStyle = {
 			display: "block",
+			boxSizing: "border-box",
+			height: "60px",
 			padding: "10px",
 			position: this.props.position,
 			zIndex: 100,
 			top: "20px",
-			left: "20px",
+			right: "20px",
 			fill: "white",
 			backgroundColor: this.props.themeColor,
 			opacity: this.props.zoomedIn ? 1 : 0,

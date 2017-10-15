@@ -118,16 +118,6 @@ export default class Giphy extends React.Component {
 			top: 0
 		};
 
-		const numberOfColumns = {
-			default: 1,
-			breakpoints: {
-				"768px"  : 3,
-				"1024px" : 4,
-				"1280px" : 5,
-				"1440px" : 6
-			}
-		};
-
 		let inputContainerStyle = {
 			bottom: this.props.zoomedIn ? "0" : "-120px",
 		}
@@ -135,9 +125,6 @@ export default class Giphy extends React.Component {
 		let elements = this.state.gifs.map( (gif, index) => {
 			return (				
 				<GifViewer key={gif.id} gif={gif}/>
-				// <ImageViewer key={gif.src}>
-					// <img src={gif.src} width={gif.width} height={gif.height}/>
-				// </ImageViewer>
 			);
 		});
 
@@ -149,7 +136,6 @@ export default class Giphy extends React.Component {
 				onWillZoomOut: this.handlePyramidWillZoomOut.bind(this),
 				style: pyramidStyle,
 				derenderIfNotInViewAnymore: true,
-				numberOfColumns,
 				extraPaddingTop: 100,
 				extraPaddingBottom: 100
 			}
@@ -165,7 +151,7 @@ export default class Giphy extends React.Component {
 
 		return (
 			<div className="demo">
-				<Cover {...this.props}>Giphy</Cover>
+				<Cover {...this.props} {...this.state}>Giphy</Cover>
 
 				<div className="input-container" style={inputContainerStyle}>
 					<input ref="input" type="search" placeholder="Search Giphy…" onChange={this.handleSearch.bind(this)} onClick={this.handleSearchClick.bind(this)} />

@@ -67,7 +67,7 @@ class ImageViewer extends React.PureComponent {
 			position: "relative",
 			margin: "auto",
 			width: "100%",
-			paddingBottom: ((image.props.height / image.props.width) * 100) + "%",
+			height: ((image.props.height / image.props.width) * this.props.containerWidth) + "px",
 			cursor: this.props.zoomedOut ? "pointer" : "auto",
 			opacity: this.props.inView && this.state.loaded ? 1 : 0,
 			transition: "opacity 300ms linear",
@@ -90,7 +90,7 @@ class ImageViewer extends React.PureComponent {
 			height: null
 		}
 
-		image= React.cloneElement(image, imageProps);
+		image = React.cloneElement(image, imageProps);
 
 		return(
 			<div style={imageViewerStyle} onClick={this.props.zoomIn} onMouseOver={this.props.onMouseOver} onMouseOut={this.props.onMouseOut}>
