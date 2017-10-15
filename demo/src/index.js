@@ -10,6 +10,7 @@ import Giphy from "./giphy";
 import Images from "./images.js";
 import Cinema from "./cinema.js";
 import Docs from "./docs.js";
+import Gallery from "./gallery.js";
 
 class Demo extends React.Component {
 	constructor(props) {
@@ -34,6 +35,7 @@ class Demo extends React.Component {
 				<Giphy width="100" height="20" themeColor="#7e00ff"/>
 				<Cinema width="100" height="20" themeColor="#ff1b00" />
 				<Docs width="100" height="20" themeColor="#ffba00"/>
+				<Gallery width="100" height="20" themeColor="#1cbe7f"/>
 			</Pyramid>
 		);
 	}
