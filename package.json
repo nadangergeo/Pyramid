@@ -1,6 +1,6 @@
 {
   "name": "react-pyramid",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Responsive masonry grid with infinte scroll and lazy loading, built with react.",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
