@@ -396,6 +396,8 @@ export default class Pyramid extends React.PureComponent {
 				left: padding,
 				width: elementWidth,
 				height: elementHeight,
+				pyramidWidth: this.getScroller().clientWidth,
+				pyramidHeight: this.getScroller().clientHeight,
 				inView: this.allElementProps[index] ? this.allElementProps[index].inView : false,
 				zoomTransition: this.props.zoomTransition ? this.props.zoomTransition : null,
 				index: key,

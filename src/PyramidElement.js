@@ -83,7 +83,7 @@ class PyramidElement extends React.PureComponent {
 	componentDidUpdate(prevProps, prevState) {
 		if(this.state.zoomingIn || this.state.zoomingOut) {
 			if(!this.hasZoomTransition()) {
-				console.log("no transiton, faking transition end event");
+				// console.log("no transiton, faking transition end event");
 				this.handleTransitionEnd();
 			}
 		}
@@ -314,6 +314,11 @@ class PyramidElement extends React.PureComponent {
 			elementProps.inView = this.props.inView;
 			elementProps.containerWidth = this.props.width;
 			elementProps.containerHeight = this.props.height;
+
+			if(this.state.zoomedIn || this.state.zoomingIn) {
+				elementProps.containerWidth = this.props.pyramidWidth;
+				elementProps.containerHeight = this.props.pyramidHeight;
+			}
 
 			if(element.props.zoomable) {
 				elementProps.zoomIn = this.zoomIn.bind(this);
