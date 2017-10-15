@@ -257,7 +257,7 @@ export default class Pyramid extends React.PureComponent {
 		if(typeof this.props[prop] === "number") {
 			value = this.props[prop];
 		} else if(typeof this.props[prop] === "string") {
-			value = parseInt(this.props[prop]);
+			value = parseInt(this.props[prop], 10);
 		} else {
 			// Let the value be intially defined as the default value.
 			value = this.props[prop].default;
@@ -492,11 +492,9 @@ export default class Pyramid extends React.PureComponent {
 			});
 		}
 
-		if(this.state.zoomingIn || this.state.zoomedIn) {
-			pyramidStyle = Object.assign(pyramidStyle, {
-				overflowY: "hidden"
-			});
-		}
+		pyramidStyle = Object.assign(pyramidStyle, {
+			overflowY: this.state.zoomingIn || this.state.zoomedIn ? "hidden" : "auto" 
+		});
 
 		let pyramidClassesOptions = {
 			modifiers: {
