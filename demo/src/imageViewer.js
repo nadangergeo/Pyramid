@@ -1,12 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import PropTypes from 'prop-types';
 
 import CloseButton from "./closeButton";
 
 class ImageViewer extends React.PureComponent {
 	static propTypes = {
-		zoomable: React.PropTypes.bool,
-		inView: React.PropTypes.bool
+		zoomable: PropTypes.bool,
+		inView: PropTypes.bool
 	};
 
 	static defaultProps = { 

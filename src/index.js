@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import PropTypes from 'prop-types';
 import BEMHelper from "react-bem-helper";
 import getUnit from "get-unit";
 import elementResizeDetector from "element-resize-detector";
@@ -9,22 +9,22 @@ import PyramidElement from "./PyramidElement";
 
 export default class Pyramid extends React.PureComponent {
 	static propTypes = { 
-		numberOfColumns: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string, React.PropTypes.object]),
-		magicValue: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string, React.PropTypes.object]),
-		className: React.PropTypes.string,
-		gutter: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string, React.PropTypes.object]),
-		padding: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string, React.PropTypes.object]),
-		extraPaddingTop: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-		extraPaddingBottom: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-		zoomTransition: React.PropTypes.string,
-		derenderIfNotInViewAnymore: React.PropTypes.bool,
-		style: React.PropTypes.object,
-		scroller: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.object]),
-		erd: React.PropTypes.object,
-		onWillZoomIn: React.PropTypes.func,
-		onWillZoomOut: React.PropTypes.func,
-		onDidZoomIn: React.PropTypes.func,
-		onDidZoomOut: React.PropTypes.func
+		numberOfColumns: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.object]),
+		magicValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.object]),
+		className: PropTypes.string,
+		gutter: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.object]),
+		padding: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.object]),
+		extraPaddingTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+		extraPaddingBottom: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+		zoomTransition: PropTypes.string,
+		derenderIfNotInViewAnymore: PropTypes.bool,
+		style: PropTypes.object,
+		scroller: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
+		erd: PropTypes.object,
+		onWillZoomIn: PropTypes.func,
+		onWillZoomOut: PropTypes.func,
+		onDidZoomIn: PropTypes.func,
+		onDidZoomOut: PropTypes.func
 	};
 
 	static defaultProps = { 

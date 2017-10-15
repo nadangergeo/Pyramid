@@ -1,29 +1,30 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import PropTypes from 'prop-types';
 import BEMHelper from "react-bem-helper";
 import elementResizeDetector from "element-resize-detector";
 import transitionUtility from "transition-utility";
 
 class PyramidElement extends React.PureComponent {
 	static propTypes = { 
-		width: React.PropTypes.oneOfType([
-					React.PropTypes.string,
-					React.PropTypes.number
+		width: PropTypes.oneOfType([
+					PropTypes.string,
+					PropTypes.number
 				]).isRequired,
-		height: React.PropTypes.oneOfType([
-					React.PropTypes.string,
-					React.PropTypes.number
+		height: PropTypes.oneOfType([
+					PropTypes.string,
+					PropTypes.number
 				]).isRequired,
-		top: React.PropTypes.number,
-		left: React.PropTypes.number,
-		className: React.PropTypes.string,
-		zoomTransition: React.PropTypes.string,
-		inView: React.PropTypes.bool,
-		erd: React.PropTypes.object,
-		onWillZoomIn: React.PropTypes.func,
-		onWillZoomOut: React.PropTypes.func,
-		onDidZoomIn: React.PropTypes.func,
-		onDidZoomOut: React.PropTypes.func,
+		top: PropTypes.number,
+		left: PropTypes.number,
+		className: PropTypes.string,
+		zoomTransition: PropTypes.string,
+		inView: PropTypes.bool,
+		erd: PropTypes.object,
+		onWillZoomIn: PropTypes.func,
+		onWillZoomOut: PropTypes.func,
+		onDidZoomIn: PropTypes.func,
+		onDidZoomOut: PropTypes.func,
 	};
 
 	static defaultProps = { 

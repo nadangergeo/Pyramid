@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import elementResizeDetector from "element-resize-detector";
 
 import "./giphy.css";
@@ -9,7 +10,7 @@ import Cover from "./cover";
 
 export default class Giphy extends React.Component {
 	static propTypes = {
-		zoomable: React.PropTypes.bool
+		zoomable: PropTypes.bool
 	};
 
 	static defaultProps = { 

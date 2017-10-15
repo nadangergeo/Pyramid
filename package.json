@@ -23,6 +23,7 @@
     "element-resize-detector": "^1.1.9",
     "get-unit": "^2.0.1",
     "lodash.throttle": "^4.1.1",
+    "prop-types": "^15.6.0",
     "react-bem-helper": "^1.2.0",
     "transition-utility": "^1.0.1"
   },

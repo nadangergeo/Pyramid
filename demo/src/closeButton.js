@@ -1,9 +1,10 @@
 import React from "react";
+import PropTypes from 'prop-types';
 
 export default class CloseButton extends React.Component {
 	static propTypes = {
-		themeColor: React.PropTypes.string,
-		position: React.PropTypes.string
+		themeColor: PropTypes.string,
+		position: PropTypes.string
 	};
 
 	static defaultProps = { 

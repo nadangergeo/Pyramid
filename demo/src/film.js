@@ -1,14 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import PropTypes from 'prop-types';
 
 import "./film.css";
 import CloseButton from "./closeButton";
 
 class Film extends React.PureComponent {
 	static propTypes = {
-		zoomable: React.PropTypes.bool,
-		inView: React.PropTypes.bool,
-		data: React.PropTypes.object.isRequired
+		zoomable: PropTypes.bool,
+		inView: PropTypes.bool,
+		data: PropTypes.object.isRequired
 	};
 
 	static defaultProps = { 

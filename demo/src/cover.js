@@ -1,12 +1,13 @@
 import React from "react";
+import PropTypes from 'prop-types';
 
 import "./cover.css";
 import CloseButton from "./closeButton";
 
 export default class Cover extends React.Component {
 	static propTypes = {
-		themeColor: React.PropTypes.string,
-		zIndex: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
+		themeColor: PropTypes.string,
+		zIndex: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 	};
 
 	static defaultProps = { 

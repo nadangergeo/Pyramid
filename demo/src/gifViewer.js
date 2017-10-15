@@ -1,11 +1,12 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import ImageViewer from "./imageViewer";
 
 export default class GifViewer extends React.Component {
 	static propTypes = {
-		zoomable: React.PropTypes.bool,
-		inView: React.PropTypes.bool,
-		gif: React.PropTypes.object.isRequired
+		zoomable: PropTypes.bool,
+		inView: PropTypes.bool,
+		gif: PropTypes.object.isRequired
 	};
 
 	static defaultProps = { 

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import elementResizeDetector from "element-resize-detector";
 
 import Pyramid from "../../src";
@@ -16,7 +17,7 @@ import patternLandscape from "./img/pattern_landscape.svg";
 
 export default class Images extends React.Component {
 	static propTypes = {
-		zoomable: React.PropTypes.bool
+		zoomable: PropTypes.bool
 	};
 
 	static defaultProps = { 
