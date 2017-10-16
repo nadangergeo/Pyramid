@@ -250,7 +250,8 @@ class PyramidElement extends React.PureComponent {
 			left: this.props.left,
 			zIndex: !this.state.zoomedOut ? 10000 : 0,
 			opacity: this.props.inView && this.state.loaded ? 1 : 0,
-			transition: "opacity 300ms linear"
+			transition: "opacity 300ms linear",
+			willChange: "top, left, width, height"
 		});
 
 		if(this.state.zoomedIn || this.state.zoomingIn) {
