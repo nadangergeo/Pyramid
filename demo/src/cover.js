@@ -21,7 +21,8 @@ export default class Cover extends React.Component {
 			height: this.props.zoomedIn || this.props.zoomingIn ? "100px" : "100%",
 			cursor: this.props.zoomedOut ? "pointer" : "auto",
 			zIndex: this.props.zIndex,
-			opacity: this.props.fullscreen ? 0 : 1
+			display: this.props.pyramidIsZoomedIn ? "none" : "flex",
+			opacity: this.props.pyramidIsZoomingIn || this.props.pyramidIsZoomedIn ? 0 : 1
 		};
 
 		const headerStyle = {

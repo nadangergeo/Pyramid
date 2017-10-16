@@ -7,6 +7,12 @@ import Pyramid from "../../src";
 import GifViewer from "./gifViewer";
 import ImageViewer from "./imageViewer";
 import Cover from "./cover";
+import {
+	handlePyramidDidZoomIn,
+	handlePyramidDidZoomOut,
+	handlePyramidWillZoomIn,
+	handlePyramidWillZoomOut
+} from "./commonHooks"
 
 export default class Giphy extends React.Component {
 	static propTypes = {
@@ -58,18 +64,6 @@ export default class Giphy extends React.Component {
 		event.stopPropagation();
 	}
 
-	handlePyramidWillZoomIn(event) {
-		this.setState({
-			fullscreen: true
-		});
-	}
-
-	handlePyramidWillZoomOut(event) {
-		this.setState({
-			fullscreen: false
-		});
-	}
-
 	search(searchQuery) {
 		var _this = this;
 
@@ -119,7 +113,7 @@ export default class Giphy extends React.Component {
 		};
 
 		let inputContainerStyle = {
-			bottom: this.props.zoomedIn ? "0" : "-120px",
+			bottom: this.props.zoomedIn && !(this.state.pyramidIsZoomingIn || this.state.pyramidIsZoomedIn) ? "0" : "-120px"
 		}
 
 		let elements = this.state.gifs.map( (gif, index) => {
@@ -132,8 +126,10 @@ export default class Giphy extends React.Component {
 		if(this.props.zoomedIn || this.props.zoomingOut){
 			let props = {
 				erd: this.erd,
-				onWillZoomIn: this.handlePyramidWillZoomIn.bind(this),
-				onWillZoomOut: this.handlePyramidWillZoomOut.bind(this),
+				onDidZoomIn: handlePyramidDidZoomIn.bind(this),
+				onDidZoomOut: handlePyramidDidZoomOut.bind(this),
+				onWillZoomIn: handlePyramidWillZoomIn.bind(this),
+				onWillZoomOut: handlePyramidWillZoomOut.bind(this),
 				style: pyramidStyle,
 				derenderIfNotInViewAnymore: true,
 				extraPaddingTop: 100,
