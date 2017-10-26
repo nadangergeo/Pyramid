@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import elementResizeDetector from "element-resize-detector";
 
 import Pyramid from "../../src";
-import ImageViewer from "./imageViewer";
 import Cover from "./cover";
 
 import circle from "./img/circle.svg";

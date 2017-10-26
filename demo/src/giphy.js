@@ -4,15 +4,14 @@ import elementResizeDetector from "element-resize-detector";
 
 import "./giphy.css";
 import Pyramid from "../../src";
-import GifViewer from "./gifViewer";
-import ImageViewer from "./imageViewer";
 import Cover from "./cover";
+import GifViewer from "./GifViewer";
 import {
 	handlePyramidDidZoomIn,
 	handlePyramidDidZoomOut,
 	handlePyramidWillZoomIn,
 	handlePyramidWillZoomOut
-} from "./commonHooks"
+} from "./commonHooks";
 
 export default class Giphy extends React.Component {
 	static propTypes = {
@@ -31,15 +30,22 @@ export default class Giphy extends React.Component {
 
 		this.state = {
 			gifs: [],
-			fullscreen: false
+			pyramidIsZoomedIn: false,
+			pyramidIsZoomedOut: true,
+			pyramidIsZoomingIn: false,
+			pyramidIsZoomingOut: false
 		}
 
 		this.defaultSearch = "trippy";
+		this.handleKeyDown = this.handleKeyDown.bind(this);
+		this.handleSearch = this.handleSearch.bind(this);
+		this.handleSearchClick = this.handleSearchClick.bind(this);
 	}
 
 	componentWillReceiveProps(nextProps) {
 		if(nextProps.zoomingIn) {
 			this.search(this.defaultSearch);
+			// this.refs.input.focus();
 		}
 	}
 
@@ -49,11 +55,12 @@ export default class Giphy extends React.Component {
 		}
 	}
 
-	componentDidMount() {
-		if(this.props.zoomedIn) {
-			this.search(this.defaultSearch);
-			this.refs.input.focus();
-		}
+	componentWillUnmount() {
+		window.removeEventListener("keydown", this.handleKeyDown, false);
+	}
+
+	componentWillMount(){
+		window.addEventListener("keydown", this.handleKeyDown, false);
 	}
 
 	handleSearch(event) {
@@ -62,6 +69,18 @@ export default class Giphy extends React.Component {
 
 	handleSearchClick(event) {
 		event.stopPropagation();
+	}
+
+	handleKeyDown(event) {
+		if(this.props.zoomedIn && this.state.pyramidIsZoomedOut) {
+			if(event.which === 27) { // esc
+				this.props.zoomOut(event);
+			}
+
+			if(event.which >= 49 && event.which <= 58) { // 1
+				this.refs.gifPyramid.zoomIn(event, event.which - 49);
+			}
+		}
 	}
 
 	search(searchQuery) {
@@ -107,13 +126,11 @@ export default class Giphy extends React.Component {
 	render() {
 		const pyramidStyle = {
 			height: "100%",
-			position: "absolute", // This allows the elements' positions be relative to the demo
-			zIndex: "auto",
 			top: 0
 		};
 
 		let inputContainerStyle = {
-			bottom: this.props.zoomedIn && !(this.state.pyramidIsZoomingIn || this.state.pyramidIsZoomedIn) ? "0" : "-120px"
+			transform: "translateY(" + (this.props.zoomedIn && !(this.state.pyramidIsZoomingIn || this.state.pyramidIsZoomedIn) ? "0" : "120px") + ")"
 		}
 
 		let elements = this.state.gifs.map( (gif, index) => {
@@ -123,7 +140,7 @@ export default class Giphy extends React.Component {
 		});
 
 		let gifPyramid;
-		if(this.props.zoomedIn || this.props.zoomingOut){
+		if(this.props.zoomedIn){
 			let props = {
 				erd: this.erd,
 				onDidZoomIn: handlePyramidDidZoomIn.bind(this),
@@ -137,7 +154,7 @@ export default class Giphy extends React.Component {
 			}
 
 			gifPyramid = (
-				<Pyramid {...props}>
+				<Pyramid ref="gifPyramid" {...props}>
 					{elements}
 				</Pyramid>
 			);
@@ -150,7 +167,7 @@ export default class Giphy extends React.Component {
 				<Cover {...this.props} {...this.state}>Giphy</Cover>
 
 				<div className="input-container" style={inputContainerStyle}>
-					<input ref="input" type="search" placeholder="Search Giphy…" onChange={this.handleSearch.bind(this)} onClick={this.handleSearchClick.bind(this)} />
+					<input ref="input" type="search" placeholder="Search Giphy…" onChange={this.handleSearch} onClick={this.handleSearchClick} />
 				</div>
 
 				{gifPyramid}

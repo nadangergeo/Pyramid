@@ -1,4 +1,4 @@
-function handlePyramidDidZoomIn(event) {
+function handlePyramidDidZoomIn(index, event) {
 	this.setState({
 		pyramidIsZoomedIn: true,
 		pyramidIsZoomedOut: false,
@@ -7,25 +7,27 @@ function handlePyramidDidZoomIn(event) {
 	});
 }
 
-function handlePyramidDidZoomOut(event) {
+function handlePyramidDidZoomOut(index, event) {
 	this.setState({
 		pyramidIsZoomedIn: false,
 		pyramidIsZoomedOut: true,
 		pyramidIsZoomingIn: false,
-		pyramidIsZoomingOut: false
+		pyramidIsZoomingOut: false,
+		zoomIndex: null
 	});
 }
 
-function handlePyramidWillZoomIn(event) {
+function handlePyramidWillZoomIn(index, event) {
 	this.setState({
 		pyramidIsZoomedIn: false,
 		pyramidIsZoomedOut: false,
 		pyramidIsZoomingIn: true,
-		pyramidIsZoomingOut: false
+		pyramidIsZoomingOut: false,
+		zoomIndex: index
 	});
 }
 
-function handlePyramidWillZoomOut(event) {
+function handlePyramidWillZoomOut(index, event) {
 	this.setState({
 		pyramidIsZoomedIn: false,
 		pyramidIsZoomedOut: false,

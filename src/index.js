@@ -43,7 +43,7 @@ export default class Pyramid extends React.PureComponent {
 		padding: 20,
 		extraPaddingTop: 0,
 		extraPaddingBottom: 0,
-		derenderIfNotInViewAnymore: false,
+		derenderIfNotInViewAnymore: true,
 		scroller: true
 	};
 
@@ -74,8 +74,12 @@ export default class Pyramid extends React.PureComponent {
 			zoomedOut: true,
 			zoomingIn: false,
 			zoomingOut: false,
+			zoomIndex: null,
 			measurements: {}
 		}
+
+		this.zoomIn = this.zoomIn.bind(this);
+		this.zoomOut = this.zoomOut.bind(this);
 	}
 
 	componentDidMount() {
@@ -170,16 +174,42 @@ export default class Pyramid extends React.PureComponent {
 		}
 	}
 
-	zoomIn(event, index) {
-		this.refs["element" + index].zoomIn(event);
+	zoomIn(event, index, zoomTransition) {
+		// return new Promise((abracadabra, defectus) => {
+		// 	this.promises.push({
+		// 		spell: "zoomIn",
+		// 		index,
+		// 		abracadabra,
+		// 		defectus
+		// 	});
+
+		// 	this.refs["element" + index].zoomIn(event, zoomTransition);
+		// });
+
+		this.refs["element" + index].zoomIn(event, zoomTransition);
+
 	}
 
-	zoomOut(event, index) {
-		this.refs["element" + index].zoomOut(event);
+	zoomOut(event, index, zoomTransition) {
+		this.refs["element" + index].zoomOut(event, zoomTransition);
+	}
+
+	switchZoom(from, to) {
+		this.setState({
+			switching: true,
+			zoomIndex: to
+		});
+
+		this.refs["element" + to].zoomIn(null, "none");
+		this.refs["element" + from].zoomOut(null, "none");
 	}
 
 	willZoomIn(index) {
 			// console.log("willZoomIn!");
+
+			if(this.state.switching) {
+				return;
+			}
 
 			if(typeof this.props.onWillZoomIn === "function") {
 				this.props.onWillZoomIn(index);
@@ -189,12 +219,17 @@ export default class Pyramid extends React.PureComponent {
 				zoomedIn: false,
 				zoomedOut: false,
 				zoomingIn: true,
-				zoomingOut: false
+				zoomingOut: false,
+				zoomIndex: index
 			});
 	}
 
 	willZoomOut(index) {
 			// console.log("willZoomOut!");
+
+			if(this.state.switching) {
+				return;
+			}
 
 			if(typeof this.props.onWillZoomOut === "function") {
 				this.props.onWillZoomOut(index);
@@ -211,6 +246,10 @@ export default class Pyramid extends React.PureComponent {
 	didZoomIn(index) {
 			// console.log("didZoomIn!");
 
+			if(this.state.switching) {
+				return;
+			}
+
 			if(typeof this.props.onDidZoomIn === "function") {
 				this.props.onDidZoomIn(index);
 			}
@@ -221,10 +260,26 @@ export default class Pyramid extends React.PureComponent {
 				zoomingIn: false,
 				zoomingOut: false
 			});
+
+			// for(let i = 0; i < this.promises.length; i++) {
+			// 	let promise = this.promises[i];
+
+			// 	if(promise.spell === "zoomIn") {
+			// 		promise.abracadabra(index);
+			// 	}
+			// }
 	}
 
 	didZoomOut(index) {
 			// console.log("didZoomOut!");
+
+			if(this.state.switching) {
+				this.setState({
+					switching: false
+				});
+
+				return;
+			}
 
 			if(typeof this.props.onDidZoomOut === "function") {
 				this.props.onDidZoomOut(index);
@@ -234,7 +289,8 @@ export default class Pyramid extends React.PureComponent {
 				zoomedIn: false,
 				zoomedOut: true,
 				zoomingIn: false,
-				zoomingOut: false
+				zoomingOut: false,
+				zoomIndex: null
 			});
 	}
 
@@ -398,7 +454,7 @@ export default class Pyramid extends React.PureComponent {
 				height: elementHeight,
 				pyramidWidth: this.getScroller().clientWidth,
 				pyramidHeight: this.getScroller().clientHeight,
-				inView: this.allElementProps[index] ? this.allElementProps[index].inView : false,
+				inView: (this.allElementProps[index] && this.allElementProps[index].inView) || index === parseInt(this.state.zoomIndex),
 				zoomTransition: this.props.zoomTransition ? this.props.zoomTransition : null,
 				index: key,
 				erd: this.erd,
@@ -440,7 +496,7 @@ export default class Pyramid extends React.PureComponent {
 			// Check if the element is in view
 			if(this.isInView(elementProps.top, elementProps.height, magicValue)) {
 				elementProps.inView = true;
-			} else if(this.props.derenderIfNotInViewAnymore) {
+			} else if(this.props.derenderIfNotInViewAnymore && this.state.zoomedOut) {
 				elementProps.inView = false;
 			}
 

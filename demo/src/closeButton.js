@@ -19,13 +19,13 @@ export default class CloseButton extends React.Component {
 			height: "60px",
 			padding: "10px",
 			position: this.props.position,
-			zIndex: 100,
+			zIndex: 1000,
 			top: "20px",
 			right: "20px",
 			fill: "white",
 			backgroundColor: this.props.themeColor,
 			opacity: this.props.zoomedIn ? 1 : 0,
-			transition: "opacity 300ms linear",
+			transition: this.props.zoomTransition || "opacity 300ms linear",
 			cursor: "pointer"
 		};
 

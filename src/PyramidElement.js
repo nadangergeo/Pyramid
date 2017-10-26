@@ -49,7 +49,8 @@ class PyramidElement extends React.PureComponent {
 			zoomedIn: false,
 			zoomedOut: true,
 			zoomingIn: false,
-			zoomingOut: false
+			zoomingOut: false,
+			zoomTransition: null
 		};
 
 		this.styleNormalizer = {
@@ -126,6 +127,18 @@ class PyramidElement extends React.PureComponent {
 		return parseFloat(style.transitionDuration) > 0 || parseFloat(computedStyle.transitionDuration) > 0;
 	}
 
+	getZoomTransition() {
+		if(!this.refs.elementContainer) {
+			return null
+		};
+
+		let style = this.refs.elementContainer.style;
+		let computedStyle = window.getComputedStyle(this.refs.elementContainer);
+		let transition = style.transition || computedStyle.transition;
+
+		return this.props.zoomTransition || transition;
+	}
+
 	handleImageLoaded() {
 		this.setState(
 			{ loaded : true }
@@ -140,8 +153,8 @@ class PyramidElement extends React.PureComponent {
 		return (typeof this.props.children.type === "function");
 	}
 
-	zoomIn(event) {
-		event.stopPropagation();
+	zoomIn(event, zoomTransition) {
+		event && event.stopPropagation();
 
 		if(this.state.zoomedIn) {
 			// already zoomed in
@@ -162,12 +175,13 @@ class PyramidElement extends React.PureComponent {
 			zoomedIn: false,
 			zoomedOut: false,
 			zoomingIn: true,
-			zoomingOut: false
+			zoomingOut: false,
+			zoomTransition: zoomTransition
 		});
 	}
 
-	zoomOut(event) {
-		event.stopPropagation();
+	zoomOut(event, zoomTransition) {
+		event && event.stopPropagation();
 
 		if(this.state.zoomedOut) {
 			// already zoomed out
@@ -188,7 +202,8 @@ class PyramidElement extends React.PureComponent {
 			zoomedIn: false,
 			zoomedOut: false,
 			zoomingIn: false,
-			zoomingOut: true
+			zoomingOut: true,
+			zoomTransition: zoomTransition
 		});
 	}
 
@@ -207,7 +222,8 @@ class PyramidElement extends React.PureComponent {
 			zoomedIn: true,
 			zoomedOut: false,
 			zoomingIn: false,
-			zoomingOut: false
+			zoomingOut: false,
+			zoomTransition: null
 		});
 	}
 
@@ -226,7 +242,8 @@ class PyramidElement extends React.PureComponent {
 			zoomedIn: false,
 			zoomedOut: true,
 			zoomingIn: false,
-			zoomingOut: false
+			zoomingOut: false,
+			zoomTransition: null
 		});
 
 		if(!this.isMediaType()) {
@@ -249,9 +266,9 @@ class PyramidElement extends React.PureComponent {
 			top: this.props.top,
 			left: this.props.left,
 			zIndex: !this.state.zoomedOut ? 10000 : 0,
-			opacity: this.props.inView && this.state.loaded ? 1 : 0,
-			transition: "opacity 300ms linear",
-			willChange: "top, left, width, height"
+			opacity: this.props.inView && this.state.loaded && this.props.height !== "auto" ? 1 : 0,
+			// willChange: "top, left, width, height"
+			transform: "translateZ(0)"
 		});
 
 		if(this.state.zoomedIn || this.state.zoomingIn) {
@@ -268,7 +285,7 @@ class PyramidElement extends React.PureComponent {
 
 		if(this.state.zoomingIn || this.state.zoomingOut) {
 			containerStyle = Object.assign(containerStyle, {
-				transition: this.props.zoomTransition ? this.props.zoomTransition : null
+				transition: this.state.zoomTransition || this.props.zoomTransition || null
 			});
 		}
 
@@ -305,8 +322,8 @@ class PyramidElement extends React.PureComponent {
 		let elementProps = {
 			style: elementStyle,
 			onLoad: this.isMediaType() ? this.handleImageLoaded.bind(this) : null,
-			width: null,
-			height: null,
+			width: this.isMediaType() ? null : element.props.width,
+			height: this.isMediaType() ? null : element.props.height,
 			ref: element.ref ? element.ref : "element"
 		}
 
@@ -328,6 +345,7 @@ class PyramidElement extends React.PureComponent {
 				elementProps.zoomedOut = this.state.zoomedOut;
 				elementProps.zoomingIn = this.state.zoomingIn;
 				elementProps.zoomingOut = this.state.zoomingOut;    
+				elementProps.zoomTransition = this.getZoomTransition() || null;  
 			}
 		}
 

@@ -3,8 +3,14 @@ import PropTypes from 'prop-types';
 import elementResizeDetector from "element-resize-detector";
 
 import Pyramid from "../../src";
-import SwipeableImages from "./SwipeableImages";
 import Cover from "./cover";
+import ImageViewer from "./ImageViewer";
+import {
+	handlePyramidDidZoomIn,
+	handlePyramidDidZoomOut,
+	handlePyramidWillZoomIn,
+	handlePyramidWillZoomOut
+} from "./commonHooks";
 
 import circle from "./img/circle.svg";
 import triangle from "./img/triangle.svg";
@@ -30,73 +36,85 @@ export default class Gallery extends React.Component {
 		// Create a elementResizeDetector.
 		this.erd = props.erd || elementResizeDetector({strategy: "scroll"});
 
-		this.images = [
-			<img key={0} src={patternSquare} alt="" width="1000" height="1000"/>,
-			<img key={1} src={circle} alt="" width="1000" height="1000"/>,
-			<img key={2} src={patternPortrait} alt="" width="1000" height="1600"/>,
-			<img key={3} src={triangle} alt="" width="1000" height="1000"/>,
-			<img key={4} src={patternLandscape} alt="" width="1600" height="1000"/>,
-			<img key={5} src={square} alt="" width="1000" height="1000"/>,
-			<img key={6} src={patternSquare} alt="" width="1000" height="1000"/>,
-			<img key={7} src={star} alt="" width="1000" height="1000"/>,
-			<img key={8} src={patternPortrait} alt="" width="1000" height="1600"/>,
-			<img key={9} src={hexagon} alt="" width="1000" height="1000"/>,
+		this.state = {
+			pyramidIsZoomedIn: false,
+			pyramidIsZoomedOut: true,
+			pyramidIsZoomingIn: false,
+			pyramidIsZoomingOut: false
+		};
 
-			<img key={10} src={patternSquare} alt="" width="1000" height="1000"/>,
-			<img key={11} src={circle} alt="" width="1000" height="1000"/>,
-			<img key={12} src={patternPortrait} alt="" width="1000" height="1600"/>,
-			<img key={13} src={triangle} alt="" width="1000" height="1000"/>,
-			<img key={14} src={patternLandscape} alt="" width="1600" height="1000"/>,
-			<img key={15} src={square} alt="" width="1000" height="1000"/>,
-			<img key={16} src={patternSquare} alt="" width="1000" height="1000"/>,
-			<img key={17} src={star} alt="" width="1000" height="1000"/>,
-			<img key={18} src={patternPortrait} alt="" width="1000" height="1600"/>,
-			<img key={19} src={hexagon} alt="" width="1000" height="1000"/>,
+		this.handleKeyDown = this.handleKeyDown.bind(this);
+	}
 
-			<img key={20} src={patternSquare} alt="" width="1000" height="1000"/>,
-			<img key={21} src={circle} alt="" width="1000" height="1000"/>,
-			<img key={22} src={patternPortrait} alt="" width="1000" height="1600"/>,
-			<img key={23} src={triangle} alt="" width="1000" height="1000"/>,
-			<img key={24} src={patternLandscape} alt="" width="1600" height="1000"/>,
-			<img key={25} src={square} alt="" width="1000" height="1000"/>,
-			<img key={26} src={patternSquare} alt="" width="1000" height="1000"/>,
-			<img key={27} src={star} alt="" width="1000" height="1000"/>,
-			<img key={28} src={patternPortrait} alt="" width="1000" height="1600"/>,
-			<img key={29} src={hexagon} alt="" width="1000" height="1000"/>
-		];
+	componentWillUnmount() {
+		window.removeEventListener("keydown", this.handleKeyDown.bind(this), false);
+	}
 
-		this.swipeableImages = this.images.map((image, index) => {
-			return (
-				<SwipeableImages key={index} index={index}>
-					{this.images}
-				</SwipeableImages>
-			);
-		});
+	componentWillMount(){
+		window.addEventListener("keydown", this.handleKeyDown.bind(this), false);
+	}
+
+	handleKeyDown(event) {
+		if(this.props.zoomedIn && this.state.pyramidIsZoomedOut) {
+			if(event.which === 27) { // esc
+				this.props.zoomOut(event);
+			}
+		}
 	}
 
 	render() {
-
 		const pyramidStyle = {
-			height: "calc(100% - 100px)",
-			top: "100px",
+			height: "100%",
+			top: 0
 		};
 
-		let galleryPyramid;
-		if(this.props.zoomedIn || this.props.zoomingIn || this.props.zoomingOut){
-			galleryPyramid = (
-				<Pyramid erd={this.erd} style={pyramidStyle}>
-					{this.swipeableImages}
+		let pyramid;
+		if(this.props.zoomedIn){
+			let pyramidProps = {
+				erd: this.erd,
+				onDidZoomIn: handlePyramidDidZoomIn.bind(this),
+				onDidZoomOut: handlePyramidDidZoomOut.bind(this),
+				onWillZoomIn: handlePyramidWillZoomIn.bind(this),
+				onWillZoomOut: handlePyramidWillZoomOut.bind(this),
+				style: pyramidStyle,
+				derenderIfNotInViewAnymore: true,
+				extraPaddingTop: 100
+			}
+
+			pyramid = (
+				<Pyramid {...pyramidProps}>
+					<ImageViewer src={patternSquare} alt="" width="1000" height="1000"/>
+					<ImageViewer src={circle} alt="" width="1000" height="1000"/>
+					<ImageViewer src={patternPortrait} alt="" width="1000" height="1600"/>
+					<ImageViewer src={triangle} alt="" width="1000" height="1000"/>
+					<ImageViewer src={patternLandscape} alt="" width="1600" height="1000"/>
+					<ImageViewer src={square} alt="" width="1000" height="1000"/>
+					<ImageViewer src={patternSquare} alt="" width="1000" height="1000"/>
+					<ImageViewer src={star} alt="" width="1000" height="1000"/>
+					<ImageViewer src={patternPortrait} alt="" width="1000" height="1600"/>
+					<ImageViewer src={hexagon} alt="" width="1000" height="1000"/>
+
+					<ImageViewer src={patternSquare} alt="" width="1000" height="1000"/>
+					<ImageViewer src={circle} alt="" width="1000" height="1000"/>
+					<ImageViewer src={patternPortrait} alt="" width="1000" height="1600"/>
+					<ImageViewer src={triangle} alt="" width="1000" height="1000"/>
+					<ImageViewer src={patternLandscape} alt="" width="1600" height="1000"/>
+					<ImageViewer src={square} alt="" width="1000" height="1000"/>
+					<ImageViewer src={patternSquare} alt="" width="1000" height="1000"/>
+					<ImageViewer src={star} alt="" width="1000" height="1000"/>
+					<ImageViewer src={patternPortrait} alt="" width="1000" height="1600"/>
+					<ImageViewer src={hexagon} alt="" width="1000" height="1000"/>
 				</Pyramid>
 			);
 		} else {
-			galleryPyramid = null;
+			pyramid = null;
 		}
 
 		return (
 			<div className="demo">
-				<Cover {...this.props}>Gallery</Cover>
+				<Cover {...this.props} {...this.state}>Gallery</Cover>
 
-				{galleryPyramid}
+				{pyramid}
 			</div>
 		);
 	}

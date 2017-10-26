@@ -7,13 +7,19 @@
 	left: 0;
 	bottom: 0;
 	right: 0;
-	z-index: 100;
+	z-index: 10000;
 	overflow: visible;
 	background-color: #000;
 	color: #fff;
 	opacity: 1;
-	transition: all 200ms linear;
+	transition: all 200ms cubic-bezier(0.785, 0.135, 0.150, 0.860);
 	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.3);
+}
+
+@media screen and (prefers-reduced-motion) {
+	.cover {
+		transition: none;
+	}
 }
 
 .cover__header {

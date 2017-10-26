@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from 'prop-types';
-import ImageViewer from "./imageViewer";
+import ImageViewer from "./ImageViewer";
 
 export default class GifViewer extends React.Component {
 	static propTypes = {
@@ -44,11 +44,13 @@ export default class GifViewer extends React.Component {
 
 	render() {
 		const src = !this.props.zoomedOut || this.state.viewGif ? this.props.gif.src : this.props.gif.stillSrc;
+		const width = (typeof this.props.gif.width) === "undefined" ? "auto" : this.props.gif.width;
+		const height = (typeof this.props.gif.height) === "undefined" ? "auto" : this.props.gif.height;
 
 		return (
-			<ImageViewer onMouseOver={this.handleMouseOver.bind(this)} onMouseOut={this.handleMouseOut.bind(this)} {...this.props}>
-				<img src={src} width={this.props.gif.width} height={this.props.gif.height}/>
-			</ImageViewer>
+			<div style={{height: "100%"}}onMouseOver={this.handleMouseOver.bind(this)} onMouseOut={this.handleMouseOut.bind(this)}>
+				<ImageViewer {...this.props} src={src} width={width} height={height}/>
+			</div>
 		);
 	}
 }

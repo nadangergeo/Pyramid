@@ -12,17 +12,16 @@ export default class Cover extends React.Component {
 
 	static defaultProps = { 
 		themeColor: "black",
-		zIndex: "100"
+		zIndex: "20000"
 	};
 
 	render() {
 		const coverStyle = {
 			backgroundColor: this.props.themeColor,
-			height: this.props.zoomedIn || this.props.zoomingIn ? "100px" : "100%",
+			height: this.props.zoomedIn || this.props.zoomingIn ? "100px" : "100px",
 			cursor: this.props.zoomedOut ? "pointer" : "auto",
 			zIndex: this.props.zIndex,
-			display: this.props.pyramidIsZoomedIn ? "none" : "flex",
-			opacity: this.props.pyramidIsZoomingIn || this.props.pyramidIsZoomedIn ? 0 : 1
+			transform: "translateY(" + (this.props.pyramidIsZoomingIn || this.props.pyramidIsZoomedIn ? "-100px" : 0) + ")"
 		};
 
 		const headerStyle = {
