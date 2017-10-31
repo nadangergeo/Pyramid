@@ -5,6 +5,8 @@ function handlePyramidDidZoomIn(index, event) {
 		pyramidIsZoomingIn: false,
 		pyramidIsZoomingOut: false
 	});
+
+	this.props.onDidZoomIn && this.props.onDidZoomIn();
 }
 
 function handlePyramidDidZoomOut(index, event) {
@@ -15,6 +17,8 @@ function handlePyramidDidZoomOut(index, event) {
 		pyramidIsZoomingOut: false,
 		zoomIndex: null
 	});
+
+	this.props.onDidZoomOut && this.props.onDidZoomOut();
 }
 
 function handlePyramidWillZoomIn(index, event) {
@@ -25,6 +29,8 @@ function handlePyramidWillZoomIn(index, event) {
 		pyramidIsZoomingOut: false,
 		zoomIndex: index
 	});
+
+	this.props.onWillZoomIn && this.props.onWillZoomIn();
 }
 
 function handlePyramidWillZoomOut(index, event) {
@@ -34,9 +40,11 @@ function handlePyramidWillZoomOut(index, event) {
 		pyramidIsZoomingIn: false,
 		pyramidIsZoomingOut: true
 	});
+
+	this.props.onWillZoomOut && this.props.onWillZoomOut();
 }
 
-export default {
+export {
 	handlePyramidDidZoomIn,
 	handlePyramidDidZoomOut,
 	handlePyramidWillZoomIn,

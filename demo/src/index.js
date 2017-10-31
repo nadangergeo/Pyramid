@@ -6,12 +6,12 @@ import "./index.css";
 import Pyramid from "../../src";
 
 //demos
-import Giphy from "./giphy";
-import Images from "./images.js";
-import Cinema from "./cinema.js";
-import Docs from "./docs.js";
-import Gallery from "./Gallery.js";
-import AdvancedGallery from "./AdvancedGallery.js";
+import Giphy from "./views/Giphy";
+import Images from "./views/Images";
+import Cinema from "./views/Cinema";
+import Docs from "./views/Docs";
+import Gallery from "./views/Gallery";
+import AdvancedGallery from "./views/AdvancedGallery";
 
 class Demo extends React.Component {
 	constructor(props) {
@@ -28,12 +28,12 @@ class Demo extends React.Component {
 
 		return (
 			<Pyramid padding="0" gutter="0" numberOfColumns="1" erd={this.erd} style={pyramidStyle} zoomable={true}>
-				<Images/>
-				<Giphy themeColor="#7e00ff"/>
+				<Images title="Images"/>
+				<Giphy title="Giphy" themeColor="#7e00ff"/>
 				<Cinema themeColor="#ff1b00" />
 				<Docs themeColor="#ffba00"/>
-				<Gallery themeColor="#12b886"/>
-				<AdvancedGallery themeColor="#4c6ef5"/>
+				<Gallery title="Gallery" themeColor="#12b886"/>
+				<AdvancedGallery title="Advanced Gallery" themeColor="#4c6ef5"/>
 			</Pyramid>
 		);
 	}
