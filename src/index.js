@@ -158,7 +158,7 @@ export default class Pyramid extends React.PureComponent {
 		let scrollTop = this.getScrollTop();
 
 		if(
-			( top + magic > scrollTop - offsetTop
+			( top + magic >= scrollTop - offsetTop
 			  &&
 			  top < ( scrollTop + scrollerHeight - offsetTop) + magic
 			)
