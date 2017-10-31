@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from 'prop-types';
-import CloseButton from "../../src/components/closeButton";
+import CloseButton from "../../components/CloseButton";
 
 function Zoomable(WrappedComponent) {
 	return class extends React.PureComponent {

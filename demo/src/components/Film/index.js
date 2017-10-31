@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import PropTypes from 'prop-types';
 
 import "./index.css";
-import CloseButton from "../../../../src/components/closeButton";
+import CloseButton from "../../../../src/components/CloseButton";
 
 class Film extends React.PureComponent {
 	static propTypes = {

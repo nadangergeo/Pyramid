@@ -15,6 +15,12 @@ body {
 	background-color: #ccc;
 }
 
+@media screen and (prefers-reduced-motion) {
+	* {
+		transition: none !important;
+	}
+}
+
 h1 {
 	font-size: 4em;
 	letter-spacing: -0.01em;
@@ -63,12 +69,6 @@ button {
 .pyramid__element--zoomedIn {
 	transition: all 200ms cubic-bezier(0.785, 0.135, 0.150, 0.860); /* cubic-bezier(0.25, 0.46, 0.45, 0.94)? */
 	background-color: black;
-}
-
-@media screen and (prefers-reduced-motion) {
-	.pyramid__element {
-		transition: none;
-	}
 }
 
 .demo {

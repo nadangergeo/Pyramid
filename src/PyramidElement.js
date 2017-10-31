@@ -136,7 +136,7 @@ class PyramidElement extends React.PureComponent {
 		let computedStyle = window.getComputedStyle(this.refs.elementContainer);
 		let transition = style.transition || computedStyle.transition;
 
-		return this.props.zoomTransition || transition;
+		return this.state.zoomTransition || this.props.zoomTransition || transition || null;
 	}
 
 	handleImageLoaded() {
@@ -285,7 +285,7 @@ class PyramidElement extends React.PureComponent {
 
 		if(this.state.zoomingIn || this.state.zoomingOut) {
 			containerStyle = Object.assign(containerStyle, {
-				transition: this.state.zoomTransition || this.props.zoomTransition || null
+				transition: this.getZoomTransition()
 			});
 		}
 
@@ -332,6 +332,8 @@ class PyramidElement extends React.PureComponent {
 			elementProps.inView = this.props.inView;
 			elementProps.containerWidth = this.props.width;
 			elementProps.containerHeight = this.props.height;
+			elementProps.pyramidWidth = this.props.pyramidWidth;
+			elementProps.pyramidHeight = this.props.pyramidHeight;
 
 			if(this.state.zoomedIn || this.state.zoomingIn) {
 				elementProps.containerWidth = this.props.pyramidWidth;
@@ -344,8 +346,8 @@ class PyramidElement extends React.PureComponent {
 				elementProps.zoomedIn = this.state.zoomedIn;
 				elementProps.zoomedOut = this.state.zoomedOut;
 				elementProps.zoomingIn = this.state.zoomingIn;
-				elementProps.zoomingOut = this.state.zoomingOut;    
-				elementProps.zoomTransition = this.getZoomTransition() || null;  
+				elementProps.zoomingOut = this.state.zoomingOut;
+				elementProps.zoomTransition = this.getZoomTransition();
 			}
 		}
 

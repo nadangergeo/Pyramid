@@ -27,11 +27,11 @@ class Demo extends React.Component {
 		};
 
 		return (
-			<Pyramid padding="0" gutter="0" numberOfColumns="1" erd={this.erd} style={pyramidStyle} zoomable={true}>
+			<Pyramid padding="0" gutter="0" numberOfColumns="1" erd={this.erd} style={pyramidStyle}>
 				<Images title="Images"/>
 				<Giphy title="Giphy" themeColor="#7e00ff"/>
 				<Cinema themeColor="#ff1b00" />
-				<Docs themeColor="#ffba00"/>
+				<Docs title="Docs" themeColor="#ffba00"/>
 				<Gallery title="Gallery" themeColor="#12b886"/>
 				<AdvancedGallery title="Advanced Gallery" themeColor="#4c6ef5"/>
 			</Pyramid>

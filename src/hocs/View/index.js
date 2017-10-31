@@ -2,13 +2,13 @@ import React from "react";
 import PropTypes from 'prop-types';
 import elementResizeDetector from "element-resize-detector";
 
-import Cover from "../components/Cover";
+import Cover from "../../components/Cover";
 import {
 	handlePyramidDidZoomIn,
 	handlePyramidDidZoomOut,
 	handlePyramidWillZoomIn,
 	handlePyramidWillZoomOut
-} from "../commonHooks";
+} from "../../utils";
 
 function View(WrappedComponent) {
 	return class extends React.Component {
@@ -56,15 +56,17 @@ function View(WrappedComponent) {
 			};
 
 			let pyramid;
-			if(this.props.zoomedIn || this.props.zoomingOut){
+			if(this.props.zoomedIn){
 				let pyramidProps = {
+					...this.props,
 					erd: this.erd,
 					onDidZoomIn: handlePyramidDidZoomIn.bind(this),
 					onDidZoomOut: handlePyramidDidZoomOut.bind(this),
 					onWillZoomIn: handlePyramidWillZoomIn.bind(this),
 					onWillZoomOut: handlePyramidWillZoomOut.bind(this),
 					style: pyramidStyle,
-					extraPaddingTop: 100
+					extraPaddingTop: 100,
+					ref: "pyramid"
 				}
 
 				pyramid = (

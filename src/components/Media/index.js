@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from 'prop-types';
 import SwipeableViews from 'react-swipeable-views';
 import { mod } from 'react-swipeable-views-core';
-import ContainCentered from "../../src/hocs/ContainCentered";
+import ContainCentered from "../../../src/hocs/ContainCentered";
 
 export default class Media extends React.PureComponent {
 	static propTypes = {
@@ -127,15 +127,17 @@ export class Carousel extends React.Component {
 	}
 
 	handleKeyDown(event) {
-		if(event.which === 37) { // left
-			this.setState({
-				index: this.state.index - 1 < 0 ? 0 : this.state.index - 1
-			});
-		}
-		else if(event.which === 39) { // right
-			this.setState({
-				index: this.state.index + 1 === this.props.data.length ? this.props.data.length - 1 : (this.state.index + 1) % this.props.data.length
-			});
+		if(this.props.zoomedIn) {
+			if(event.which === 37) { // left
+				this.setState({
+					index: this.state.index - 1 < 0 ? 0 : this.state.index - 1
+				});
+			}
+			else if(event.which === 39) { // right
+				this.setState({
+					index: this.state.index + 1 === this.props.data.length ? this.props.data.length - 1 : (this.state.index + 1) % this.props.data.length
+				});
+			}
 		}
 	}
 

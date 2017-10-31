@@ -200,8 +200,8 @@ export default class Pyramid extends React.PureComponent {
 			zoomIndex: to
 		});
 
-		this.refs["element" + to].zoomIn(null, "none");
 		this.refs["element" + from].zoomOut(null, "none");
+		this.refs["element" + to].zoomIn(null, "none");
 	}
 
 	willZoomIn(index) {

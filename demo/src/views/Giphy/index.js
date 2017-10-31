@@ -2,16 +2,17 @@ import React from "react";
 import PropTypes from 'prop-types';
 import elementResizeDetector from "element-resize-detector";
 
-import "./index.css";
 import Pyramid from "../../../../src";
-import Cover from "../../components/Cover";
+import View from "../../../../src/hocs/View";
 import GifViewer from "../../../../src/components/GifViewer";
 import {
 	handlePyramidDidZoomIn,
 	handlePyramidDidZoomOut,
 	handlePyramidWillZoomIn,
 	handlePyramidWillZoomOut
-} from "../../commonHooks";
+} from "../../../../src/utils";
+
+const PyramidView = View(Pyramid);
 
 export default class Giphy extends React.Component {
 	static propTypes = {
@@ -25,19 +26,11 @@ export default class Giphy extends React.Component {
 	constructor(props) {
 		super(props);
 
-		// Create a elementResizeDetector.
-		this.erd = props.erd || elementResizeDetector({strategy: "scroll"});
-
 		this.state = {
 			gifs: [],
-			pyramidIsZoomedIn: false,
-			pyramidIsZoomedOut: true,
-			pyramidIsZoomingIn: false,
-			pyramidIsZoomingOut: false
 		}
 
 		this.defaultSearch = "trippy";
-		this.handleKeyDown = this.handleKeyDown.bind(this);
 		this.handleSearch = this.handleSearch.bind(this);
 		this.handleSearchClick = this.handleSearchClick.bind(this);
 	}
@@ -45,7 +38,7 @@ export default class Giphy extends React.Component {
 	componentWillReceiveProps(nextProps) {
 		if(nextProps.zoomingIn) {
 			this.search(this.defaultSearch);
-			this.refs.input.focus();
+			// this.refs.input.focus();
 		}
 	}
 
@@ -55,32 +48,12 @@ export default class Giphy extends React.Component {
 		}
 	}
 
-	componentWillUnmount() {
-		window.removeEventListener("keydown", this.handleKeyDown, false);
-	}
-
-	componentWillMount(){
-		window.addEventListener("keydown", this.handleKeyDown, false);
-	}
-
 	handleSearch(event) {
 		this.search(event.target.value);
 	}
 
 	handleSearchClick(event) {
 		event.stopPropagation();
-	}
-
-	handleKeyDown(event) {
-		if(this.props.zoomedIn && this.state.pyramidIsZoomedOut) {
-			if(event.which === 27) { // esc
-				this.props.zoomOut(event);
-			}
-
-			if(event.which >= 49 && event.which <= 58) { // 1
-				this.refs.gifPyramid.zoomIn(event, event.which - 49);
-			}
-		}
 	}
 
 	search(searchQuery) {
@@ -93,6 +66,7 @@ export default class Giphy extends React.Component {
 			let data = json.data;
 			let gifs = data.map(gif => {
 				let image = gif.images.downsized;
+				// let still = gif.images.fixed_width_downsampled;
 				let still = gif.images.downsized_still;
 
 				return {
@@ -123,55 +97,74 @@ export default class Giphy extends React.Component {
 		});
 	}
 
-	render() {
-		const pyramidStyle = {
-			height: "100%",
-			top: 0
-		};
-
-		let inputContainerStyle = {
-			transform: "translateY(" + (this.props.zoomedIn && !(this.state.pyramidIsZoomingIn || this.state.pyramidIsZoomedIn) ? "0" : "120px") + ")",
-			opacity: this.props.zoomedIn && !(this.state.pyramidIsZoomingIn || this.state.pyramidIsZoomedIn) ? 1 : 0
-		}
-
-		let elements = this.state.gifs.map( (gif, index) => {
+	getGifViewers() {
+		return this.state.gifs.map( (gif, index) => {
 			return (				
 				<GifViewer key={gif.id} gif={gif}/>
 			);
 		});
+	}
+	
+	render() {
+		let inputContainerStyle = {
+			transform: "translateY(" + (this.props.zoomedIn && !(this.state.pyramidIsZoomingIn || this.state.pyramidIsZoomedIn) ? "0" : "120px") + ")",
+			opacity: this.props.zoomedIn && !(this.state.pyramidIsZoomingIn || this.state.pyramidIsZoomedIn) ? 1 : 0,
+			position: "fixed",
+			bottom: "0",
+			width: "100%",
+			height: "100px",
+			paddingBottom: "0",
+			boxSizing: "border-box",
+			zIndex: "100",
+			boxShadow: "0 -1px 10px rgba(0, 0, 0, 0.3)",
+			transition: this.props.zoomTransition
+		}
 
-		let gifPyramid;
-		if(this.props.zoomedIn){
-			let props = {
-				erd: this.erd,
-				onDidZoomIn: handlePyramidDidZoomIn.bind(this),
-				onDidZoomOut: handlePyramidDidZoomOut.bind(this),
-				onWillZoomIn: handlePyramidWillZoomIn.bind(this),
-				onWillZoomOut: handlePyramidWillZoomOut.bind(this),
-				style: pyramidStyle,
-				derenderIfNotInViewAnymore: true,
-				extraPaddingTop: 100,
-				extraPaddingBottom: 100
+		let inputStyle = {
+			width: "100%",
+			height: "100%",
+			padding: "20px 40px",
+			border: "none",
+			outline: "none",
+			background: "white",
+			color: "#444",
+			fontSize: "1.5em",
+			fontWeight: "bold",
+			letterSpacing: "-0.02em",
+			MozAppearance: "none",
+			WebkitAppearance: "none",
+			WebkitBorderRadius: "0px",
+			borderRadius: "0px"
+		};	
+
+		let getGifViewers = this.getGifViewers();
+
+		let pyramidProps = {
+			...this.props,
+			onDidZoomIn: handlePyramidDidZoomIn.bind(this),
+			onDidZoomOut: handlePyramidDidZoomOut.bind(this),
+			onWillZoomIn: handlePyramidWillZoomIn.bind(this),
+			onWillZoomOut: handlePyramidWillZoomOut.bind(this),
+			extraPaddingBottom: 100,
+			numberOfColumns: {
+				default: 1,
+				breakpoints: {
+					"768px"  : 2,
+					"1024px" : 3,
+					"1280px" : 4
+				}
 			}
-
-			gifPyramid = (
-				<Pyramid ref="gifPyramid" {...props}>
-					{elements}
-				</Pyramid>
-			);
-		} else {
-			gifPyramid = null;
 		}
 
 		return (
-			<div className="demo">
-				<Cover {...this.props} {...this.state}>Giphy</Cover>
+			<div style={{height:"100%"}}>
+				<PyramidView {...pyramidProps}>
+					{getGifViewers}
+				</PyramidView>
 
 				<div className="input-container" style={inputContainerStyle}>
-					<input ref="input" type="search" placeholder="Search Giphy…" onChange={this.handleSearch} onClick={this.handleSearchClick} />
+					<input ref="input" type="search" style={inputStyle} placeholder="Search Giphy…" onChange={this.handleSearch} onClick={this.handleSearchClick} />
 				</div>
-
-				{gifPyramid}
 			</div>
 		);
 	}

@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import elementResizeDetector from "element-resize-detector";
 
 import Pyramid from "../../../../src";
-import Cover from "../../components/Cover";
+import View from "../../../../src/hocs/View";
+
+const PyramidView = View(Pyramid);
 
 export default class Docs extends React.Component {
 	static propTypes = {
@@ -13,25 +15,11 @@ export default class Docs extends React.Component {
 	static defaultProps = { 
 		zoomable: true
 	};
-
-	constructor(props) {
-		super(props);
-
-		// Create a elementResizeDetector.
-		this.erd = props.erd || elementResizeDetector({strategy: "scroll"});
-	}
-
+	
 	render() {
-
-		const pyramidStyle = {
-			height: "calc(100% - 100px)",
-			top: "100px",
-		};
-
 		return (
-			<div className="demo">
-				<Cover {...this.props}>Docs</Cover>
-			</div>
+			<PyramidView {...this.props}>
+			</PyramidView>
 		);
 	}
 }
