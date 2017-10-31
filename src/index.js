@@ -366,7 +366,7 @@ export default class Pyramid extends React.PureComponent {
 		// If the width of the Pyramid is undefined (which it will be on first render pass),
 		// or if there are no elements
 		// render out an empty Pyramid.
-		if((this.state && !this.pyramidWidth) || this.props.children.length === 0) {
+		if((this.state && !this.pyramidWidth) || !this.props.children || this.props.children.length === 0) {
 			// If this.props.scroller is false, make the Pyramid eventually overflow the scroller, 
 			// Assuming that if the scroller is not window, it will at least have the same height as window.
 			// This is so that getScroller() can determine the scroller.
@@ -398,11 +398,14 @@ export default class Pyramid extends React.PureComponent {
 
 		let maxBottom = 0;
 
+		// Make sure children is an array even when it's only one child
+		const children = this.props.children.length ? this.props.children : [this.props.children];
+
 		// Let's create The Elements of the Pyramid.
 		// ("The Elements of the Pyramid"? Lol, sound like a sequel to Luc Besson's "The Fifth Element" ^^)
 
 		// Let's start by doing some necessary checks
-		let elements = this.props.children.filter( element => {
+		let elements = children.filter( element => {
 			if(!element.props.width || !element.props.height) {
 				switch(element.type) {
 					case "img":
