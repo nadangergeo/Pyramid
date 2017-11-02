@@ -38,7 +38,7 @@ export default class Pyramid extends React.PureComponent {
 			}
 		},
 		magicValue: 0,
-		className: "pyramid",
+		className: "pyramid", //This will be the B in BEM
 		gutter: 20,
 		padding: 20,
 		extraPaddingTop: 0,
@@ -78,10 +78,15 @@ export default class Pyramid extends React.PureComponent {
 			measurements: {}
 		}
 
+		// You can call these on Pyramid to zoomIn/zoomOut an element
+		// See function declartions for more insight.
 		this.zoomIn = this.zoomIn.bind(this);
 		this.zoomOut = this.zoomOut.bind(this);
 	}
 
+	/**
+	 * React life cycle method. Called when the component did mount.
+	 */
 	componentDidMount() {
 		this.mounted = true;
 
@@ -94,6 +99,9 @@ export default class Pyramid extends React.PureComponent {
 		this.getScroller().addEventListener('scroll', this.throttledScrollEventFunction, true);
 	}
 
+	/**
+	 * React life cycle method. Called when the component is about to unmount.
+	 */
 	componentWillUnmount() {
 		this.mounted = false;
 
@@ -102,14 +110,17 @@ export default class Pyramid extends React.PureComponent {
 		this.getScroller().removeEventListener('scroll', this.throttledScrollEventFunction, true);
 	}
 
+	/**
+	 * Returns element which handles the scrolling
+	 */
 	getScroller() {
-		if(this.scroller) {
+		if(this.scroller) { // Have we already figured out the scroller?
 			return this.scroller;
-		} else if(typeof this.props.scroller === "object") {
+		} else if(typeof this.props.scroller === "object") { // Is there a prop?
 			return this.scroller = this.props.scroller;
-		} else if(this.props.scroller === true) {
+		} else if(this.props.scroller === true) { // Is pyramid the scroller?
 			return this.scroller = this.refs.pyramid;
-		} else {
+		} else { // Let's try figuring out the scroller (TODO: replace this method)
 			let scroller;
 			let el = this.refs.pyramid;
 			let found = false;
@@ -130,14 +141,25 @@ export default class Pyramid extends React.PureComponent {
 		} 
 	}
 
+	/**
+	 * Returns the top of the scroller
+	 */
 	getScrollTop(scroller = this.getScroller()){
 		return scroller === window ? scroller.pageYOffset : scroller.scrollTop;
 	}
 
-	handleResize(event) {
+	/**
+	 * Handles resize events from Element Resize Detector
+	 * @param {object} pyramidElement The pyramid DOM element
+	 */
+	handleResize(pyramidElement) {
 		this.reRender();
 	}
 
+	/**
+	 * Handles scroll events
+	 * @param {object} event SyntheticEvent (scroll)
+	 */
 	handleScroll(event) {
 		if(this.state.zoomedIn) {
 			event.preventDefault();
@@ -147,6 +169,12 @@ export default class Pyramid extends React.PureComponent {
 		this.reRender();
 	}
 
+	/**
+	 * Returns true if the element (the parameters) are within the Pyramids view.
+	 * @param {number} top The vertical position of the element.
+	 * @param {number} height The height of the element
+	 * @param {number} magicValue Magic Value to use. Should be a fraction between 0-1. If >0, then it will be less strict.
+	 */
 	isInView(top, height, magicValue) {
 		// If the element is in view (or close to using magic value).
 		// One could say this is mathemagic.
@@ -174,7 +202,13 @@ export default class Pyramid extends React.PureComponent {
 		}
 	}
 
-	zoomIn(event, index, zoomTransition) {
+	/**
+	 * Zoom in an element
+	 * @param {object} event The event that caused the method call.
+	 * @param {number} index The index of the element to zoom in.
+	 * @param {string} zoomTransition Optional transition that you can use to override the global zoomTransition prop/css.
+	 */
+	zoomIn(event, index, zoomTransition = null) {
 		// return new Promise((abracadabra, defectus) => {
 		// 	this.promises.push({
 		// 		spell: "zoomIn",
@@ -187,13 +221,23 @@ export default class Pyramid extends React.PureComponent {
 		// });
 
 		this.refs["element" + index].zoomIn(event, zoomTransition);
-
 	}
 
+	/**
+	 * Zoom out an element
+	 * @param {object} event The event that caused the method call.
+	 * @param {number} index The index of the element to zoom out.
+	 * @param {string} zoomTransition Optional transition that you can use to override the global zoomTransition prop/css.
+	 */
 	zoomOut(event, index, zoomTransition) {
 		this.refs["element" + index].zoomOut(event, zoomTransition);
 	}
 
+	/**
+	 * Switch out which element is zoomed in, with no transitions.
+	 * @param {number} from The index of the element to zoom out.
+	 * @param {number} to The index of the element to zoom in.
+	 */
 	switchZoom(from, to) {
 		this.setState({
 			switching: true,
@@ -204,17 +248,24 @@ export default class Pyramid extends React.PureComponent {
 		this.refs["element" + to].zoomIn(null, "none");
 	}
 
+	/**
+	 * Called by an element as it is about to zoom in.
+	 * @param {number} from The index of the element which will zoom in.
+	 */
 	willZoomIn(index) {
 			// console.log("willZoomIn!");
 
+			// Do nothing if it's just a switch
 			if(this.state.switching) {
 				return;
 			}
 
+			// Call prop onWillZoomIn if set
 			if(typeof this.props.onWillZoomIn === "function") {
 				this.props.onWillZoomIn(index);
 			}
 
+			// Update Zoom states
 			this.setState({
 				zoomedIn: false,
 				zoomedOut: false,
@@ -224,17 +275,24 @@ export default class Pyramid extends React.PureComponent {
 			});
 	}
 
+	/**
+	 * Called by an element as it is about to zoom out.
+	 * @param {number} from The index of the element which will zoom out.
+	 */
 	willZoomOut(index) {
 			// console.log("willZoomOut!");
 
+			// Do nothing if it's just a switch
 			if(this.state.switching) {
 				return;
 			}
 
+			// Call prop onWillZoomOut if set
 			if(typeof this.props.onWillZoomOut === "function") {
 				this.props.onWillZoomOut(index);
 			}
 
+			// Update Zoom states
 			this.setState({
 				zoomedIn: false,
 				zoomedOut: false,
@@ -243,17 +301,24 @@ export default class Pyramid extends React.PureComponent {
 			});
 	}
 
+	/**
+	 * Called by an element when it has finished zooming in.
+	 * @param {number} from The index of the element which has zoomed in.
+	 */
 	didZoomIn(index) {
 			// console.log("didZoomIn!");
 
+			// Do nothing if it's just a switch
 			if(this.state.switching) {
 				return;
 			}
 
+			// Call prop onDidZoomIn if set
 			if(typeof this.props.onDidZoomIn === "function") {
 				this.props.onDidZoomIn(index);
 			}
 
+			// Update Zoom states
 			this.setState({
 				zoomedIn: true,
 				zoomedOut: false,
@@ -270,9 +335,15 @@ export default class Pyramid extends React.PureComponent {
 			// }
 	}
 
+	/**
+	 * Called by an element when it has finished zooming out.
+	 * @param {number} from The index of the element which has zoomed out.
+	 */
 	didZoomOut(index) {
 			// console.log("didZoomOut!");
 
+			// If it's a switch, the switch is now done.
+			// Update state and do nothing else.
 			if(this.state.switching) {
 				this.setState({
 					switching: false
@@ -281,10 +352,12 @@ export default class Pyramid extends React.PureComponent {
 				return;
 			}
 
+			// Call prop onDidZoomOut if set
 			if(typeof this.props.onDidZoomOut === "function") {
 				this.props.onDidZoomOut(index);
 			}
 
+			// Update Zoom states
 			this.setState({
 				zoomedIn: false,
 				zoomedOut: true,
@@ -294,6 +367,12 @@ export default class Pyramid extends React.PureComponent {
 			});
 	}
 
+	/**
+	 * Updates necesseary measurements for an element
+	 * @param {number} index The index of the element to update.
+	 * @param {number} width The new width.
+	 * @param {number} height The new height.
+	 */
 	updateMeasurements(index, width, height) {
 		let newMeasurements = Object.assign(this.state.measurements, {
 			[index]: {
@@ -307,6 +386,10 @@ export default class Pyramid extends React.PureComponent {
 		})
 	}
 
+	/**
+	 * Returns a value, which is resonsive (the prop has breakpoints).
+	 * @param {string} prop The responsive property to get value from.
+	 */
 	getResponsivePropValue(prop) {
 		let value;
 
@@ -445,7 +528,6 @@ export default class Pyramid extends React.PureComponent {
 			else {
 				elementHeight = "auto";
 			} 
-			
 
 			// Let's set the inital props using what we know thus far.
 			let elementProps = {};
@@ -464,6 +546,7 @@ export default class Pyramid extends React.PureComponent {
 				onResize: this.updateMeasurements.bind(this)
 			});
 
+			// Give the element some extra props if it is zoomable
 			if(element.props.zoomable) {
 				elementProps = Object.assign(elementProps, {
 					onWillZoomIn: this.willZoomIn.bind(this),
@@ -473,6 +556,7 @@ export default class Pyramid extends React.PureComponent {
 					pyramidScrollTop: this.getScrollTop()
 				});
 
+				// Disable zoomability if the pyramid is already zoomed in
 				if(this.state.zoomedIn) {
 					elementProps.zoomable = false;
 				}
