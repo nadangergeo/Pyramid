@@ -1,4 +1,4 @@
-# Pyramid
+# ▲ Pyramid
 
 [![Travis][build-badge]][build]
 [![npm package][npm-badge]][npm]
@@ -20,6 +20,8 @@ Responsive masonry grid with infinte scroll and lazy loading, built with react.
 - [ ] Allow passing elements as children (instead?)
 - [ ] Allow react components as elements
 - [ ] *Super secret plan*
+
+Check out [the dev branch](https://github.com/nadangergeo/Pyramid/tree/dev), to see where this component is headed! It's going to be epic!
 
 ## Demo
 
