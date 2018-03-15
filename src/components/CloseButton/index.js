@@ -27,7 +27,7 @@ export default class CloseButton extends React.Component {
 			opacity: this.props.zoomTransition === "none" || this.props.zoomedIn ? 1 : 0,
 			transition: this.props.zoomTransition,
 			transitionProperty: "opacity",
-			transitionTimingFunctin: "linear",
+			transitionTimingFunction: "linear",
 			cursor: "pointer"
 		};
 
