@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import BEMHelper from "react-bem-helper";
 import elementResizeDetector from "element-resize-detector";
 import transitionUtility from "transition-utility";
+import { getShorthandTransitionFromComputedStyle } from "./utils";
 
 class PyramidElement extends React.PureComponent {
 	static propTypes = { 
@@ -164,7 +165,7 @@ class PyramidElement extends React.PureComponent {
 
 		let style = this.refs.elementContainer.style;
 		let computedStyle = window.getComputedStyle(this.refs.elementContainer);
-		let transition = style.transition || computedStyle.transition;
+		let transition = style.transition || computedStyle.transition || getShorthandTransitionFromComputedStyle(computedStyle);
 
 		return this.state.zoomTransition || this.props.zoomTransition || transition || null;
 	}
