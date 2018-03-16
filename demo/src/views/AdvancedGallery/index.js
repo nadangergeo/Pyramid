@@ -40,9 +40,9 @@ export default class AdvancedGallery extends React.Component {
 
 		let that = this;
 		//let the dom catch some breath...
-		setTimeout(function(){
+		// setTimeout(function(){
 			that.refs.pyramidView.refs.pyramid.switchZoom(from, to);
-		}, 20);
+		// }, 20);
 	}
 	
 	render() {
