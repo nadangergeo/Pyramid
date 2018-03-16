@@ -46,7 +46,7 @@ export default class Media extends React.PureComponent {
 			opacity: this.props.inView && this.state.loaded ? 1 : 0,
 			transition: this.props.transitions ? this.props.transitions.join(",") : this.props.zoomTransition || null,
 			/*lineHeight: 0, not needed anymore?*/
-			// willChange: "width, height, opacity"
+			willChange: "width, height, opacity",
 			transform: "translateZ(0)"
 		};
 
@@ -158,14 +158,15 @@ export class Carousel extends React.Component {
 		let that = this;
 		let currentIndex = this.state.index;
 
-		let toBeLoaded = 3;
+		let toBeLoaded = 4;
 		if(currentIndex === 0 || currentIndex === this.props.data.length - 1) {
-			toBeLoaded = 2;
+			toBeLoaded = 3;
 		}
 
 		if(this.state.numOfloaded + 1 === toBeLoaded) {
 			this.setState({
-				loaded: true
+				loaded: true,
+				numOfloaded: this.state.numOfloaded + 1
 			});
 		} else {
 			this.setState({
@@ -179,10 +180,12 @@ export class Carousel extends React.Component {
 	}
 
 	getCarouselSlices(cover = false) {
-		let transitions = [this.props.zoomTransition];
+		let transitions = [];
 		let currentIndex = this.state.index;
 
-		if(!cover) {
+		if(cover) {
+			transitions.push(this.props.zoomTransition);
+		} else {
 			transitions.push("opacity 0ms linear");
 		};
 
@@ -199,7 +202,7 @@ export class Carousel extends React.Component {
 				inView: cover ? this.props.inView : Math.abs(currentIndex - index) < 2,
 				key: index,
 				index: index,
-				onLoad: cover ? null : this.handleLoaded,
+				onLoad: this.handleLoaded,
 				transitions: transitions
 			};
 
