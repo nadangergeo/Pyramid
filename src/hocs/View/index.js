@@ -13,11 +13,15 @@ import {
 function View(WrappedComponent) {
 	return class extends React.Component {
 		static propTypes = {
-			zoomable: PropTypes.bool
+			zoomable: PropTypes.bool,
+			viewClassName: PropTypes.string,
+			coverHeight: PropTypes.string
 		};
 
 		static defaultProps = { 
-			zoomable: true
+			zoomable: true,
+			viewClassName: "view",
+			coverHeight: "100px"
 		};
 
 		constructor(props) {
@@ -51,6 +55,17 @@ function View(WrappedComponent) {
 		}
 
 		render() {
+			// const coverHeight = this.props.zoomedIn || this.props.zoomingIn ? "100px" : "100px";
+			const coverHeight = "100px";
+
+			const viewStyle = {
+				position: "relative",
+				zIndex: "100",
+				width: "100%",
+				height: "100%",
+				minHeight: coverHeight
+			};
+
 			const pyramidStyle = {
 				height: "100%"
 			};
@@ -79,8 +94,8 @@ function View(WrappedComponent) {
 			}
 
 			return (
-				<div className="demo">
-					<Cover {...this.props} {...this.state}>{this.props.title}</Cover>
+				<div style={viewStyle} className={this.props.viewClassName}>
+					<Cover {...this.props} {...this.state} coverHeight={coverHeight}>{this.props.title}</Cover>
 
 					{pyramid}
 				</div>

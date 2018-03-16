@@ -6,18 +6,21 @@ import CloseButton from "../CloseButton";
 export default class Cover extends React.Component {
 	static propTypes = {
 		themeColor: PropTypes.string,
-		zIndex: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+		zIndex: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+		coverHeight: PropTypes.string
 	};
 
 	static defaultProps = { 
 		themeColor: "black",
-		zIndex: "20000"
+		zIndex: "20000",
+		coverHeight: "100px"
 	};
 
 	render() {
 		const coverStyle = {
 			backgroundColor: this.props.themeColor || "#000",
-			height: this.props.zoomedIn || this.props.zoomingIn ? "100px" : "100px",
+			// height: this.props.zoomedIn || this.props.zoomingIn ? this.props.coverHeight : "100%",
+			height: this.props.coverHeight,
 			cursor: this.props.zoomedOut ? "pointer" : "auto",
 			zIndex: this.props.zIndex,
 			transform: "translateY(" + (this.props.pyramidIsZoomingIn || this.props.pyramidIsZoomedIn ? "-100px" : 0) + ")",
@@ -34,18 +37,19 @@ export default class Cover extends React.Component {
 			color: "#fff",
 			opacity: "1",
 			transition: this.props.zoomTransition,
-			boxShadow: "0 1px 10px rgba(0, 0, 0, 0.3)"
+			boxShadow: "0 2px 5px rgba(0, 0, 0, 0.3)"
 		};
 
 		const headerStyle = {
 			// fontSize: this.props.zoomedIn || this.props.zoomingIn ? "2em" : null,
 			display: "block",
 			textAlign: "center",
-			fontSize: "1.5em",
+			fontSize: "1.618em",
 			fontWeight: 600,
 			transition: "all 200ms linear",
 			marginBottom: "0",
-			marginTop: "0"
+			marginTop: "0",
+			userSelect: "none"
 		}
 
 		const cover = (
