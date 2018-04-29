@@ -32,7 +32,7 @@ http://gergeo.se/pyramid-beta-demo/
 
 ## Install
 
-npm install react-pyramid@b02 --save
+npm install react-pyramid@beta --save
 
 ## Docs
 
