@@ -17,7 +17,7 @@ import patternLandscape from "../../img/pattern_landscape.svg";
 
 const PyramidView = View(Pyramid);
 
-export default class Images extends React.Component {
+export default class Gallery extends React.Component {
 	static propTypes = {
 		zoomable: PropTypes.bool
 	};
